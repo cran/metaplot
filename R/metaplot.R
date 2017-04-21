@@ -594,7 +594,7 @@ corsplom.folded <- function(x, ...){
   meta <- x %>% filter(!is.na(META))
   data <- x %>% filter(is.na(META))
   data %<>% unfold_(var = item, ...)
-  data %<>% ungroup %>% select_(.dots=var) # ungroup should not be necessary
+  data %<>% ungroup %>% select_(.dots = item) # ungroup should not be necessary
   for(nm in names(data)){
     y <- label(meta,nm)
     if(!is.na(y))names(data)[names(data) == nm] <- y
