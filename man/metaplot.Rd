@@ -2,29 +2,32 @@
 % Please edit documentation in R/metaplot.R
 \name{metaplot}
 \alias{metaplot}
+\alias{metaplot.grouped_df}
+\alias{metaplot.data.frame}
 \alias{metaplot.folded}
-\alias{metaplot_.folded}
 \title{Metaplot}
 \usage{
 metaplot(x, ...)
 
-\method{metaplot}{folded}(x, ...)
+\method{metaplot}{grouped_df}(x, ...)
 
-\method{metaplot_}{folded}(x, var, ...)
+\method{metaplot}{data.frame}(x, ...)
+
+\method{metaplot}{folded}(x, ...)
 }
 \arguments{
 \item{x}{object}
 
 \item{...}{passed arguments}
-
-\item{var}{character: names of items to plot}
 }
 \description{
 Creates a metaplot.
 
-Creates a plot from folded, using metadata as available.
+Creates a metaplot from grouped_df.  Folds x and calls the method for folded. Dots arguments are passed only to metaplot.
 
-Creates metaplot from folded using standard evaluation.
+Creates a metaplot from data.frame.  Folds x and calls the method for folded. Dots arguments are passed only to metaplot.
+
+Creates a plot from folded, using metadata as available.
 }
 \details{
 Metaplot creates univariate, bivariate, or multivariate plots depending on the
@@ -46,9 +49,11 @@ Stratification, e.g. conditioning for trellis plots, is currently unimplemented.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{folded}: folded method
+\item \code{grouped_df}: grouped_df method
 
-\item \code{folded}: folded method for metaplot using standard evaluation
+\item \code{data.frame}: data.frame method
+
+\item \code{folded}: folded method
 }}
 
 \examples{
@@ -110,8 +115,21 @@ x \%>\% metaplot(AGE,WEIGHT, ysmooth = TRUE, xsmooth = TRUE)
 Other generic functions: \code{\link{axislabel}},
   \code{\link{continuous}}, \code{\link{corsplom}},
   \code{\link{dens}}, \code{\link{guide}},
-  \code{\link{label}}, \code{\link{metaplot_}},
+  \code{\link{label}}, \code{\link{scatter}}
+
+Other univariate plots: \code{\link{dens}}
+
+Other bivariate plots: \code{\link{boxplot}},
   \code{\link{scatter}}
+
+Other multivariate plots: \code{\link{corsplom}}
+
+Other univariate plots: \code{\link{dens}}
+
+Other bivariate plots: \code{\link{boxplot}},
+  \code{\link{scatter}}
+
+Other multivariate plots: \code{\link{corsplom}}
 
 Other univariate plots: \code{\link{dens}}
 
