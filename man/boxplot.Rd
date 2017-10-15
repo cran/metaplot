@@ -6,11 +6,12 @@
 \alias{boxplot.folded}
 \title{Boxplots}
 \usage{
-\method{boxplot}{data.frame}(x, .y, .x, log, horizontal = TRUE, main = TRUE,
-  crit = 1.3, ref = NULL, guide = NA_character_, ...)
+\method{boxplot}{data.frame}(x, .y, .x, log, horizontal = TRUE,
+  main = FALSE, crit = 1.3, ref = NULL, guide = NA_character_,
+  nobs = FALSE, na.rm = TRUE, ...)
 
-\method{boxplot}{folded}(x, .y, .x, log, horizontal, main = TRUE,
-  crit = 1.3, ref = NULL, ...)
+\method{boxplot}{folded}(x, .y, .x, log, horizontal, main = FALSE,
+  crit = 1.3, ref = NULL, na.rm = TRUE, ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -23,13 +24,17 @@
 
 \item{horizontal}{whether box/whisker axis should be horizontal}
 
-\item{main}{whether to include title indicating x and y items}
+\item{main}{logical:whether to include title indicating x and y items; or a substitute title or NULL}
 
 \item{crit}{if log is missing, log transform if mean/median ratio for non-missing x  is greater than this value}
 
 \item{ref}{optional reference line on continuous axis}
 
 \item{guide}{optional encoding for categories see \code{encode::encode}}
+
+\item{nobs}{whether to include the number of observations under the category label}
+
+\item{na.rm}{whether to remove data points with one or more missing coordinates}
 
 \item{...}{passed arguments}
 }
