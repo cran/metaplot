@@ -4,20 +4,24 @@
 \alias{boxplot_data_frame}
 \title{Boxplot Function for Data Frame}
 \usage{
-boxplot_data_frame(x, var, log = FALSE, horizontal = NULL, main = FALSE,
-  crit = 1.3, ref = NULL, nobs = FALSE, na.rm = TRUE, xlab = NULL,
-  ylab = NULL, aspect = 1, ...)
+boxplot_data_frame(x, yvar, xvar, facets = NULL, log = FALSE,
+  horizontal = NULL, crit = 1.3, ref = NULL, nobs = FALSE,
+  na.rm = TRUE, xlab = NULL, ylab = NULL, aspect = 1,
+  main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
+  NULL), ...)
 }
 \arguments{
 \item{x}{data.frame}
 
-\item{var}{character vector of variables to plot (expecting length: 2)}
+\item{yvar}{y variable}
+
+\item{xvar}{x variable}
+
+\item{facets}{optional conditioning variables}
 
 \item{log}{whether to log transform numeric variable (auto-selected if NULL)}
 
 \item{horizontal}{whether box/whisker axis should be horizontal (numeric x, categorical y); defaults TRUE if (var[[2]] is numeric}
-
-\item{main}{logical: whether to include title indicating x and y items; or a substitute title or NULL}
 
 \item{crit}{if log is NULL, log-transform if mean/median ratio for non-missing x is greater than this value}
 
@@ -33,6 +37,10 @@ boxplot_data_frame(x, var, log = FALSE, horizontal = NULL, main = FALSE,
 
 \item{aspect}{passed to \code{\link[lattice]{bwplot}}}
 
+\item{main}{character, or a function of x, yvar, xvar, facets, and log}
+
+\item{sub}{character, or a function of x, yvar, xvar, facets, and log}
+
 \item{...}{passed arguments}
 }
 \description{
@@ -41,10 +49,12 @@ Boxplot for data.frame. Uses standard evaluation.
 \examples{
 library(magrittr)
 library(dplyr)
-boxplot_data_frame(Theoph,c('Subject','conc'))
+boxplot_data_frame(Theoph,'Subject','conc')
 boxplot_data_frame(Theoph \%>\% filter(conc > 0),
-c('conc','Subject'), log = TRUE, ref = c(2,5),horizontal = FALSE)
+'conc','Subject', log = TRUE, ref = c(2,5),horizontal = FALSE)
 }
 \seealso{
-Other bivariate functions: \code{\link{boxplot.data.frame}}
+Other mixedvariate plots: \code{\link{boxplot.data.frame}}
+
+Other boxplot: \code{\link{boxplot.data.frame}}
 }

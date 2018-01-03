@@ -5,42 +5,58 @@
 #' @param ... passed arguments
 #' @export
 #' @family generic functions
-dens <- function(x,...)UseMethod('dens')
+#' @family univariate plots
+#' @family densplot
+#' @family metaplot
+densplot <- function(x,...)UseMethod('densplot')
 
 #' Density Function for Data Frame
 #'
 #' Plot density for object of class 'data.frame' using standard evaluation.
 #' @param x data.frame
-#' @param var item to plot, given as length-one character
+#' @param xvar variable to plot
+#' @param groups optional grouping variable
+#' @param facets optional conditioning variables
 #' @param xlab x axis label
 #' @param ref optional numeric
 #' @param log whether to use log scale
 #' @param aspect passed to \code{\link[lattice]{densityplot}}
 #' @param scales  passed to \code{\link[lattice]{densityplot}}
 #' @param panel  passed to \code{\link[lattice]{densityplot}}
+#' @param auto.key  passed to \code{\link[lattice]{densityplot}}
+#' @param keycols number of auto.key columns
+#' @param main character, or a function of x, xvar, groups, facets, and log
+#' @param sub character, or a function of x, xvar, groups, facets, and log
 #' @param ... passed to \code{\link[lattice]{densityplot}}
 #' @family univariate plots
-#' @importFrom rlang get_expr quo
+#' @family densplot
 #' @import lattice
 #' @export
-#' @family dens
 #' @examples
-#' dens_data_frame(Theoph, 'Wt', grid = TRUE)
-dens_data_frame<- function(
+#' densplot_data_frame(Theoph, 'conc', grid = TRUE)
+#' densplot_data_frame(Theoph, 'conc', 'Subject')
+#' densplot_data_frame(Theoph, 'conc', , 'Subject')
+densplot_data_frame<- function(
   x,
-  var,
+  xvar,
+  groups = NULL,
+  facets = NULL,
   xlab = NULL,
   ref = NULL,
   log = FALSE,
   aspect = 1,
   scales = NULL,
   panel = NULL,
+  auto.key = NULL,
+  keycols = NULL,
+  main = getOption('metaplot_main',NULL),
+  sub = getOption('metaplot_sub',NULL),
   ...
 ){
   stopifnot(inherits(x, 'data.frame'))
-  stopifnot(length(var) == 1)
-  stopifnot(is.character(var))
-  if(log)if(any(x[[var]] <= 0, na.rm = TRUE)){
+  stopifnot(length(xvar) == 1)
+  stopifnot(is.character(xvar))
+  if(log)if(any(x[[xvar]] <= 0, na.rm = TRUE)){
     warning('cannot take log of negative values')
     log <- FALSE
   }
@@ -49,68 +65,83 @@ dens_data_frame<- function(
     panel.densityplot(...)
     if(length(ref))panel.abline(v = ref)
   }
-  default_xlab <- var
-  xvarlab <- attr(x[[var]],'label')
+  default_xlab <- xvar
+  xvarlab <- attr(x[[xvar]],'label')
   if(!is.null(xvarlab)) default_xlab <- xvarlab
   if(is.null(xlab)) xlab <- default_xlab
-  densityplot(x[[var]], xlab = xlab, ref = ref, log = log, aspect = aspect, scales = scales, panel = panel, ...)
+
+  if(is.null(keycols))if(!is.null(groups))keycols <- min(3, length(unique(x[[groups]])))
+  if(is.null(auto.key))if(!is.null(groups))if(length(unique(x[[groups]])) > 1) auto.key = list(columns = keycols,lines=TRUE)
+
+  ff <- character(0)
+  if(!is.null(facets))ff <- paste(facets, collapse = ' + ')
+  if(!is.null(facets))ff <- paste0('|',ff)
+  formula <- as.formula(paste0('~', xvar) %>% paste(ff))
+  if(!is.null(facets)){
+    for (i in seq_along(facets)) x[[facets[[i]]]] <- ifcoded(x, facets[[i]])
+  }
+  if(!is.null(main))if(is.function(main)) main <- main(x = x, xvar = xvar, groups = groups, facets = facets, log = log, ...)
+  if(!is.null(sub))if(is.function(sub)) sub <- sub(x = x, xvar = xvar, groups = groups, facets = facets, log = log, ...)
+  if(!is.null(groups)) {
+    x[[groups]] <- ifcoded(x, groups)
+    groups <- as.formula(paste('~',groups))
+  }
+  densityplot(
+    formula,
+    data = x,
+    groups = groups,
+    xlab = xlab,
+    ref = ref,
+    log = log,
+    aspect = aspect,
+    scales = scales,
+    panel = panel,
+    auto.key = auto.key,
+    main = main,
+    sub = sub,
+    ...
+  )
 }
-#' Dens Method for Data Frame
+#' Densplot Method for Data Frame
 #'
-#' Plot density for object of class 'data.frame'. Uses nonstandard evaluation.
+#' Plot density for object of class 'data.frame'. Parses arguments and generates the call: fun(x, xvar, groups, facets,...).
 #' @param x data.frame
-#' @param ... item to plot, given as unquoted column name
-#' @param xlab x axis label
-#' @param ref optional numeric
-#' @param log whether to use log scale
-#' @param aspect passed to \code{\link[lattice]{densityplot}}
-#' @param scales  passed to \code{\link[lattice]{densityplot}}
-#' @param panel  passed to \code{\link[lattice]{densityplot}}
-#' @param fun function that does the actual plotting
-#' @family univariate plots
-#' @importFrom rlang get_expr quo
+#' @param ... passed to fun
+#' @param fun plotting function
 #' @import lattice
 #' @export
 #' @importFrom rlang f_rhs quos
-#' @family dens
+#' @family univariate plots
+#' @family densplot
 #' @examples
-#' dens(Theoph, Wt, grid = TRUE )
-dens.data.frame<- function(
+#' densplot(Theoph, conc, grid = TRUE )
+#' densplot(Theoph, conc, Subject )
+#' densplot(Theoph, conc, , Subject )
+#' attr(Theoph,'title') <- 'Theophylline'
+#' densplot(Theoph, conc, main= function(x,...)attr(x,'title'))
+#' densplot(Theoph, conc, sub= function(x,...)attr(x,'title'))
+
+densplot.data.frame<- function(
   x,
   ...,
-  xlab = NULL,
-  ref = NULL,
-  log = FALSE,
-  aspect = 1,
-  scales = NULL,
-  panel = NULL,
-  fun = getOption('metaplot_dens','dens_data_frame')
+  fun = getOption('metaplot_dens','densplot_data_frame')
 ){
   args <- quos(...)
   args <- lapply(args,f_rhs)
   var <- args[names(args) == '']
   other <- args[names(args) != '']
   var <- sapply(var, as.character)
-  if(length(var) < 1) stop('dens() requires an item to plot')
-  if(length(var) > 1)warning('only retaining the first item')
-  var <- var[[1]] # take first (perh. only)
-  prime <- list(x = x, var = var)
-  formal <- list(xlab = xlab, ref = ref, aspect = aspect, scales = scales, panel = panel)
-  args <- c(prime, formal, other)
+
+  # this function needs to explicitly assign xvar, groups, and facets
+  xvar <- var[[1]]
+  groups <- NULL
+  if(length(var) > 1) groups <- var[[2]]
+  if(!is.null(groups))if(groups == '') groups <- NULL
+  facets <- NULL
+  if(length(var) > 2) facets <- var[3:length(var)]
+
+  prime <- list(x = x, xvar = xvar, groups = groups, facets = facets)
+  args <- c(prime, other)
   do.call(fun, args)
 }
-
-#' Dens Method for Folded
-#'
-#' Dens method for folded. Converts to data.frame with defined column attributes and calls data.frame method.
-#' @param x folded
-#' @param ... passed to \code{\link{boxplot.data.frame}}
-#' @export
-#' @family univariate plots
-#' @family dens
-#' @examples
-#' library(fold)
-#' data(eventsf)
-#' dens(eventsf, DV)
-dens.folded <- function(x, ...)dens(pack(x),...)
 

@@ -5,7 +5,7 @@
 \title{Express Scalar Column Attributes as Column Metadata}
 \usage{
 \method{unpack}{data.frame}(x, meta = getOption("meta", "meta"),
-  position = 1L, ignore = "class", ...)
+  position = 1L, ignore = c("class", "levels"), ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -27,8 +27,6 @@ data.frame with all columns of class character
 Expresses scalar column attributes as column metadata (row values).  Column with name \code{meta} is created to hold names of attributes, if any. A transposed table (sorted by attribute name) of scalar column attribute values (coerced to character) is bound to the existing data.frame (the attributes themselves are removed from columns).  Bind position is controlled by \code{position} such that the intersection of new rows and column occurs in the corresponding corner, numbered clockwise from top-left. Resulting column classes are character. It is an error if \code{meta} is already in \code{names(x)}.
 }
 \seealso{
-\code{\link{pack.data.frame}}
-
 Other pack: \code{\link{pack.data.frame}},
-  \code{\link{pack.folded}}, \code{\link{pack}}
+  \code{\link{unpack}}
 }

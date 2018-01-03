@@ -4,9 +4,9 @@
 \alias{metapanel}
 \title{Panel Function for Metaplot Scatterplot}
 \usage{
-metapanel(x, y, groups = NULL, xref = NULL, yref = NULL,
-  ysmooth = FALSE, xsmooth = FALSE, density = FALSE, iso = FALSE,
-  fit = conf, conf = FALSE, loc = 0, msg = "metastats", ...)
+metapanel(x, y, groups, xref = NULL, yref = NULL, ysmooth = FALSE,
+  xsmooth = FALSE, fit = conf, conf = FALSE, loc = 0, iso = FALSE,
+  global = FALSE, msg = "metastats", type, ...)
 }
 \arguments{
 \item{x}{x values}
@@ -23,19 +23,21 @@ metapanel(x, y, groups = NULL, xref = NULL, yref = NULL,
 
 \item{xsmooth}{supply loess smmoth of x on y}
 
-\item{density}{plot point density instead of points}
-
-\item{iso}{use isometric axes with line of unity}
-
 \item{fit}{draw a linear fit of y ~ x}
 
 \item{conf}{logical, or width for a confidence region around a linear fit; passed to \code{\link{region}}; \code{TRUE} defaults to 95 percent confidence interval}
 
-\item{loc}{where to print statistics on a panel}
+\item{loc}{where to print statistics on a panel; suppressed for grouped plots}
+
+\item{iso}{use isometric axes with line of unity}
+
+\item{global}{if TRUE, xsmooth, ysmooth, fit, and conf are applied to all data rather than groupwise}
 
 \item{msg}{a function to print text on a panel: called with x values, y values, and \dots.}
 
-\item{...}{passed to panel.superpose, panel.smoothScatter, panel.xyplot, panel.polygon, region, panel.text}
+\item{type}{overridden by metapanel}
+
+\item{...}{passed to panel.superpose, panel.xyplot, panel.polygon, region, panel.text}
 }
 \description{
 Panel function for metaplot::scatterplot.data.frame.
@@ -47,4 +49,7 @@ Panel function for metaplot::scatterplot.data.frame.
 
 Other panel functions: \code{\link{l.p}},
   \code{\link{my.diag.panel}}, \code{\link{u.p}}
+
+Other scatter: \code{\link{scatter.data.frame}},
+  \code{\link{scatter_data_frame}}, \code{\link{scatter}}
 }

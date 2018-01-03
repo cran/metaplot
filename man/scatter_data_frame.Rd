@@ -5,12 +5,13 @@
 \title{Scatterplot Function for Data Frame}
 \usage{
 scatter_data_frame(x, yvar, xvar, groups = NULL, facets = NULL,
-  ylog = log, xlog = log, yref = NULL, xref = NULL, ylab = NULL,
-  xlab = NULL, ysmooth = FALSE, xsmooth = FALSE, cols = NULL,
-  density = FALSE, iso = FALSE, main = FALSE, corr = FALSE,
-  crit = 1.3, na.rm = TRUE, fit = conf, conf = FALSE, loc = 0,
-  aspect = 1, auto.key = NULL, as.table = TRUE, log = FALSE,
-  msg = "metastats", panel = metapanel, ...)
+  log = FALSE, ylog = log, xlog = log, yref = NULL, xref = NULL,
+  ylab = NULL, xlab = NULL, ysmooth = FALSE, xsmooth = FALSE,
+  iso = FALSE, crit = 1.3, na.rm = TRUE, aspect = 1, auto.key = NULL,
+  keycols = NULL, as.table = TRUE, prepanel = NULL, scales = NULL,
+  panel = metapanel, colors = NULL, symbols = NULL, points = TRUE,
+  lines = FALSE, main = getOption("metaplot_main", NULL),
+  sub = getOption("metaplot_sub", NULL), ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -19,9 +20,11 @@ scatter_data_frame(x, yvar, xvar, groups = NULL, facets = NULL,
 
 \item{xvar}{character: x variable}
 
-\item{groups}{optional grouping item; ignored if more than one \code{yvar}}
+\item{groups}{optional grouping variable; ignored if more than one \code{yvar}}
 
-\item{facets}{character: up to two grouping items}
+\item{facets}{optional conditioning variables}
+
+\item{log}{a default sharede by \code{ylog} and \code{xlog}}
 
 \item{ylog}{log transform y axis (guessed if NULL)}
 
@@ -39,42 +42,42 @@ scatter_data_frame(x, yvar, xvar, groups = NULL, facets = NULL,
 
 \item{xsmooth}{supply loess smmoth of x on y}
 
-\item{cols}{suggested columns for auto.key}
-
-\item{density}{plot point density instead of points (ignored if \code{groups} is supplied)}
-
-\item{iso}{use isometric axes with line of unity}
-
-\item{main}{logical: whether to construct a default title; or a substitute title or NULL}
-
-\item{corr}{append Pearson correlation coefficient to default title (only if main is \code{TRUE})}
+\item{iso}{plot line of unity}
 
 \item{crit}{if ylog or xlog missing, log transform if mean/median ratio for non-missing values is greater than crit}
 
 \item{na.rm}{whether to remove data points with one or more missing coordinates}
 
-\item{fit}{draw a linear fit of y ~ x}
-
-\item{conf}{logical, or width for a confidence region around a linear fit; passed to \code{\link{region}}; \code{TRUE} defaults to 95 percent confidence interval}
-
-\item{loc}{where to print statistics on a panel}
-
-\item{aspect}{tpassed to \code{\link[lattice]{xyplot}}}
+\item{aspect}{passed to \code{\link[lattice]{xyplot}}}
 
 \item{auto.key}{passed to \code{\link[lattice]{xyplot}}}
 
+\item{keycols}{number of auto.key columns}
+
 \item{as.table}{passed to \code{\link[lattice]{xyplot}}}
 
-\item{log}{a default sharede by \code{ylog} and \code{xlog}}
+\item{prepanel}{passed to \code{\link[lattice]{xyplot}} (guessed if NULL)}
 
-\item{msg}{a function to print text on a panel: called with x values, y values, and \dots.}
+\item{scales}{passed to \code{\link[lattice]{xyplot}} (guessed if NULL)}
 
 \item{panel}{name or definition of panel function}
+
+\item{colors}{replacements for default colors in group order}
+
+\item{symbols}{replacements for default symbols in group order}
+
+\item{points}{whether to plot points for each group: logical, or alpha values between 0 and 1}
+
+\item{lines}{whether to plot lines for each group: logical, or alpha values between 0 and 1}
+
+\item{main}{character, or a function of x, yvar, xvar, groups, facets, and log}
+
+\item{sub}{character, or a function of x, yvar, xvar, groups, facets, and log}
 
 \item{...}{passed to \code{\link{region}}}
 }
 \description{
-Scatterplot function for class 'data.frame'. Uses standard evaluation.
+Scatterplot function for class 'data.frame'.
 }
 \examples{
 library(magrittr)
@@ -89,18 +92,16 @@ scatter_data_frame(Theoph, 'conc','Time', 'Subject')
 scatter_data_frame(Theoph, 'conc','Time', facets = 'Subject')
 scatter_data_frame(Theoph \%>\% filter(conc > 0), 'conc','Time', 'Subject',ylog = TRUE, yref = 5)
 scatter_data_frame(Theoph, 'conc','Time', 'Subject',ysmooth = TRUE)
-scatter_data_frame(Theoph, 'conc','Time', main = TRUE, corr = TRUE)
+scatter_data_frame(Theoph, 'conc','Time', 'Subject',ysmooth = TRUE,global = TRUE)
+scatter_data_frame(Theoph, 'conc','Time', conf = TRUE, loc = 3, yref = 6)
 scatter_data_frame(Theoph, 'conc','Time', conf = TRUE, loc = 3, yref = 6)
 }
 \seealso{
 \code{\link{metapanel}}
 
-Other bivariate plots: \code{\link{boxplot.folded}},
-  \code{\link{metaplot.data.frame}},
-  \code{\link{metaplot.folded}},
-  \code{\link{scatter.data.frame}},
-  \code{\link{scatter.folded}}
+Other bivariate plots: \code{\link{metaplot.data.frame}},
+  \code{\link{scatter.data.frame}}, \code{\link{scatter}}
 
-Other scatter: \code{\link{scatter.data.frame}},
-  \code{\link{scatter.folded}}
+Other scatter: \code{\link{metapanel}},
+  \code{\link{scatter.data.frame}}, \code{\link{scatter}}
 }

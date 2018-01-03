@@ -5,7 +5,7 @@
 \title{Create Metaplot for Data Frame.}
 \usage{
 \method{metaplot}{data.frame}(x, ...,
-  univariate = getOption("metaplot_univariate", "dens"),
+  univariate = getOption("metaplot_univariate", "densplot"),
   mixedvariate = getOption("metaplot_mixedvariate", "boxplot"),
   bivariate = getOption("metaplot_bivariate", "scatter"),
   multivariate = getOption("metaplot_multivariate", "corsplom"),
@@ -27,18 +27,18 @@
 \item{categorical}{function for categorical arguments}
 }
 \description{
-Metaplot creates univariate, bivariate, or multivariate plots depending on the number and types of variables represented by the anonymous arguments.  Types are either numeric (NUM, e.g. real, integer) or categorical (CAT, e.g. factor, character).  A variable stored as numeric that nonetheless has an \code{\link[encode]{encoded}} \code{guide} attribute will be treated as categorical.
+Metaplot creates univariate, bivariate, or multivariate plots depending on the number and types of variables represented by the anonymous arguments.  Types are either numeric (NUM, e.g. real, integer) or categorical (CAT, e.g. factor, character).  A variable stored as numeric that nonetheless has an \code{\link[encode]{encode}}d \code{guide} attribute will be treated as categorical.
 }
 \details{
 Design your plot by specifying y variables (optional), the x variable, the groups variable (optional) and the conditioning variables (i.e., facets, optional).
 
-The single groups variable, if any, is the first categorical in the third position or later. An earlier categorical gives a bivariate plot, e.g. horizontal boxplot (first position) or vertical boxplot (second postion) causing groups and facets to be ignored.
+The single groups variable, if any, is the first categorical in the third position or later. An earlier categorical gives a "mixed" bivariate plot, e.g. horizontal boxplot (first position) or vertical boxplot (second postion) which is implicitly grouped.
 
 The x variable is the last variable before groups, if present.
 
 The y variables are those before x. If none, the result is univariate. If one, the result is typically a boxplot or scatterplot, depending on x. Several numeric y followed by a numeric x are treated as multivariate (scatterplot matrix).  But if all y have the same \code{guide} attribute and it is different from that for x, the result is bivariate (i.e, an \code{overlay} scatterplot).
 
-The groups argument is only relevant for bivariate plots with one y.  For multiple y (overlay), the sources of y are the implied groups: any trailing categorical arguments are treated as facets. To specify facets without specifying groups, let groups be empty, e.g., \code{(metaplot(y, x, , facet1, facet2))}.
+The groups argument is only relevant for bivariate plots with one y (but see \code{\link{densplot.data.frame}}).  For multiple y (overlay), the sources of y are the implied groups: any trailing categorical arguments are treated as facets. To specify facets without specifying groups, let groups be empty, e.g., \code{(metaplot(y, x, , facet1, facet2))}.
 
 Template designs follow; substitute behaviors by setting global options (see argument list).
 
@@ -47,13 +47,15 @@ Template designs follow; substitute behaviors by setting global options (see arg
 
 \item{CAT:}{ categorical (unimplemented) }
 
-\item{NUM, CAT:}{mixedvariate (vertical boxplot)}
-
-\item{CAT, NUM:}{mixedvariate (horizontal boxplot)}
-
-\item{NUM, NUM:}{bivariate (scatterplot)}
-
 \item{CAT, CAT:}{ categorical (unimplemented)}
+
+\item{NUM, CAT:}{ mixedvariate (vertical boxplot)}
+
+\item{CAT, NUM:}{ mixedvariate (horizontal boxplot)}
+
+\item{CAT, NUM, CAT:}{ mixedvariate with one facet}
+
+\item{NUM, NUM:}{ bivariate (scatterplot)}
 
 \item{NUM, NUM, CAT:}{ grouped bivariate (grouped scatterplot)}
 
@@ -106,7 +108,7 @@ attr(x$conc,'label') <- 'theophylline concentration'
 attr(x$arm,'label') <- 'trial arm'
 attr(x$site,'label') <- 'investigational site'
 attr(x$pred,'label') <- 'population-predicted concentration'
-attr(x$ipred,'label') <- 'individual-predicted conentration'
+attr(x$ipred,'label') <- 'individual-predicted concentration'
 attr(x$res,'label') <- 'residuals'
 attr(x$sres,'label') <- 'standardized residuals'
 attr(x$lKe,'label') <- 'natural log of elimination rate constant'
@@ -133,8 +135,12 @@ x \%<>\% pack
 x \%>\% metaplot(conc)
 #x \%>\% metaplot(site)
 x \%>\% metaplot(Wt, arm)
+x \%>\% densplot(Wt, arm)
 x \%>\% metaplot(arm, Wt)
+x \%>\% metaplot(Wt, arm, site)
+x \%>\% metaplot(Wt, site, arm)
 x \%>\% metaplot(conc, Time)
+x \%>\% metaplot(conc, Time, panel = panel.smoothScatter)
 #x \%>\% metaplot(arm, site)
 x \%>\% metaplot(conc, Time, Subject)
 x \%>\% metaplot(conc, Time, , Subject)
@@ -143,9 +149,11 @@ x \%>\% metaplot(conc, Time, Subject, site, arm)
 x \%>\% metaplot(lKe, lKa, lCl)
 x \%>\% metaplot(conc, ipred, Time)
 x \%>\% metaplot(conc, ipred, Time, Subject)
+x \%>\% metaplot(conc, ipred, Time, Subject, colors = 'black', points = c(T,F), lines = c(F,T))
 x \%>\% metaplot(conc, ipred, Time, site, arm)
 x \%>\% metaplot(res, conc, yref = 0, ysmooth = T, conf = T, grid = T, loc = 1)
-x \%>\% metaplot(conc, Time, panel = panel.smoothScatter)
+x \%>\% metaplot(res, conc, arm, ysmooth = T, conf = T )
+x \%>\% metaplot(res, conc, arm, ysmooth = T, conf = T, global = T)
 
 \dontshow{
 \dontrun{
@@ -159,6 +167,7 @@ y \%>\% metaplot(conc)
 #y \%>\% metaplot(site)
 y \%>\% metaplot(Wt, arm)
 y \%>\% metaplot(arm, Wt)
+y \%>\% metaplot(arm, Wt,site)
 y \%>\% metaplot(conc, Time)
 #y \%>\% metaplot(arm, site)
 y \%>\% metaplot(conc, Time, Subject)
@@ -168,26 +177,25 @@ y \%>\% metaplot(conc, Time, Subject, site, arm)
 y \%>\% metaplot(lKe, lKa, lCl)
 y \%>\% scatter(conc, ipred, Time)
 y \%>\% scatter(conc, ipred, Time, Subject)
+x \%>\% metaplot(conc, ipred, Time, Subject, colors = 'black', points = c(T,F), lines = c(F,T))
+y \%>\% scatter(conc, ipred, Time, site, arm)
+y \%<>\% mutate(Time = ifelse(Time > 15, NA, Time))
 y \%>\% scatter(conc, ipred, Time, site, arm)
 }}
 
 }
 \seealso{
-Other metaplot: \code{\link{categorical}},
-  \code{\link{metaplot.folded}}, \code{\link{metaplot}}
+Other metaplot: \code{\link{boxplot.data.frame}},
+  \code{\link{categorical}}, \code{\link{corsplom}},
+  \code{\link{densplot}}, \code{\link{metaplot}},
+  \code{\link{scatter}}
 
-Other univariate plots: \code{\link{dens.data.frame}},
-  \code{\link{dens.folded}}, \code{\link{dens_data_frame}},
-  \code{\link{metaplot.folded}}
+Other univariate plots: \code{\link{densplot.data.frame}},
+  \code{\link{densplot_data_frame}}, \code{\link{densplot}}
 
-Other bivariate plots: \code{\link{boxplot.folded}},
-  \code{\link{metaplot.folded}},
-  \code{\link{scatter.data.frame}},
-  \code{\link{scatter.folded}},
-  \code{\link{scatter_data_frame}}
+Other bivariate plots: \code{\link{scatter.data.frame}},
+  \code{\link{scatter_data_frame}}, \code{\link{scatter}}
 
 Other multivariate plots: \code{\link{corsplom.data.frame}},
-  \code{\link{corsplom.folded}},
-  \code{\link{corsplom_data_frame}},
-  \code{\link{metaplot.folded}}
+  \code{\link{corsplom_data_frame}}
 }

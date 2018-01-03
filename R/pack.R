@@ -5,8 +5,6 @@
 #' @export
 #' @param x object
 #' @param ... other arguments
-#' @seealso \code{\link{unpack}}
-#' @family pack
 pack <- function(x,...)UseMethod('pack')
 
 
@@ -22,8 +20,6 @@ pack <- function(x,...)UseMethod('pack')
 #' @importFrom utils write.table read.table
 #' @return data.frame
 #' @family pack
-#' @seealso \code{\link{unpack.data.frame}}
-#' @return data.frame
 #' @examples
 #' foo <- data.frame(head(Theoph))
 #' attr(foo$Subject, 'label') <-  'subject identifier'
@@ -73,11 +69,10 @@ pack.data.frame <- function(x, meta = getOption('meta','meta'), as.is = TRUE, ..
 #'
 #' Unpack Something.  Generic, with method for data.frame.
 #'
-#' @family unpack
+#' @family pack
 #' @export
 #' @param x object
 #' @param ... other arguments
-#' @seealso pack
 unpack <- function(x,...)UseMethod('unpack')
 
 
@@ -93,10 +88,9 @@ unpack <- function(x,...)UseMethod('unpack')
 #' @export
 #' @return data.frame
 #' @family pack
-#' @seealso \code{\link{pack.data.frame}}
 #' @importFrom dplyr bind_rows bind_cols
 #' @return data.frame with all columns of class character
-unpack.data.frame <- function(x, meta = getOption('meta','meta'), position = 1L, ignore = 'class', ...){
+unpack.data.frame <- function(x, meta = getOption('meta','meta'), position = 1L, ignore = c('class','levels'), ...){
   stopifnot(length(position) == 1)
   stopifnot(length(meta) == 1)
   stopifnot(!meta %in% names(x))
@@ -129,61 +123,3 @@ unpack.data.frame <- function(x, meta = getOption('meta','meta'), position = 1L,
   x
 }
 
-#' Normalize a Folded Data Frame
-#'
-#' Convert folded data.frame to conventional format with column attributes. Scalar metadata is converted to column attributes. Other metadata left unfolded.
-#' @export
-#' @family pack
-#' @return data.frame
-#' @seealso \code{\link[fold]{fold.data.frame}}
-#' @param x folded
-#' @param tolower whether to coerce attribute names to lower case
-#' @param ... other arguments
-#' @examples
-#' library(fold)
-#' data(eventsf)
-#' head(pack(eventsf))
-#' attributes(pack(eventsf)$BLQ)
-#'
-pack.folded <- function(x, tolower = TRUE, ...){
-  y <- unfold(x)
-  for (col in names(y)){
-    if(grepl('_',col)){
-      target <- sub('_.*','',col)
-      attrib <- sub('[^_]+_','',col)
-      if(tolower) attrib <- tolower(attrib)
-      if(target %in% names(y)){
-        val <- unique(y[[col]])
-        spar <- unique(y[,c(target,col)])
-        spar <- spar[order(spar[[target]]),]
-        spar[[target]] <- paste(spar[[target]]) # guarranteed nonmissing
-        if(length(val) == 1){
-          attr(y[[target]], attrib) <- val
-        } else {
-          if(length(spar[[target]]) == length(unique(spar[[target]]))){
-            attr(y[[target]], attrib) <- encode(spar[[target]], labels = spar[[col]])
-          }
-        }
-        y[[col]] <- NULL
-      }
-
-    }
-  }
-  y
-}
-#' Unpack a Folded Data Frame
-#'
-#' Convert folded data.frame to unpacked format with scalar metadata as row entries.
-#' @export
-#' @family unpack
-#' @return data.frame
-#' @seealso \code{\link[fold]{fold.data.frame}} \code{\link{pack.folded}}
-#' @param x folded
-#' @param tolower whether to coerce attribute names to lower case
-#' @param ... other arguments
-#' @examples
-#' library(fold)
-#' data(eventsf)
-#' head(unpack(eventsf))
-#'
-unpack.folded <- function(x, tolower = TRUE, ...)unpack(pack(x, tolower = tolower, ...), ...)

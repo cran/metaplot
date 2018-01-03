@@ -4,14 +4,16 @@
 \alias{corsplom_data_frame}
 \title{Correlated Scatterplot Matrix Function for Data Frame}
 \usage{
-corsplom_data_frame(x, var = names(x), upper.panel = u.p,
+corsplom_data_frame(x, xvar = names(x), upper.panel = u.p,
   lower.panel = l.p, pscales = 0, xlab = "", varname.cex = 1,
-  diag.panel = my.diag.panel, split = TRUE, ...)
+  diag.panel = my.diag.panel, split = TRUE,
+  main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
+  NULL), ...)
 }
 \arguments{
 \item{x}{data.frame}
 
-\item{var}{variables to plot}
+\item{xvar}{variables to plot}
 
 \item{upper.panel}{passed to splom}
 
@@ -27,6 +29,10 @@ corsplom_data_frame(x, var = names(x), upper.panel = u.p,
 
 \item{split}{break diagonal names on white space}
 
+\item{main}{character, or a function of x, xvar}
+
+\item{sub}{character, or a function of x, xvar}
+
 \item{...}{extra arguments passed to \code{\link[lattice]{splom}}}
 }
 \description{
@@ -34,10 +40,8 @@ Creates a scatterplot matrix with correlations in lower panel, by default.
 }
 \seealso{
 Other multivariate plots: \code{\link{corsplom.data.frame}},
-  \code{\link{corsplom.folded}},
-  \code{\link{metaplot.data.frame}},
-  \code{\link{metaplot.folded}}
+  \code{\link{metaplot.data.frame}}
 
 Other corsplom: \code{\link{corsplom.data.frame}},
-  \code{\link{corsplom.folded}}, \code{\link{corsplom}}
+  \code{\link{corsplom}}
 }

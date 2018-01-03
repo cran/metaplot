@@ -6,13 +6,14 @@
 #' @export
 #' @family generic functions
 #' @family corsplom
+#' @family metaplot
 corsplom <- function(x,...)UseMethod('corsplom')
 
 #' Correlated Scatterplot Matrix Function for Data Frame
 #'
 #' Creates a scatterplot matrix with correlations in lower panel, by default.
 #' @param x data.frame
-#' @param var variables to plot
+#' @param xvar variables to plot
 #' @param upper.panel passed to splom
 #' @param lower.panel passed to splom
 #' @param pscales passed to splom
@@ -20,6 +21,8 @@ corsplom <- function(x,...)UseMethod('corsplom')
 #' @param varname.cex passed to splom
 #' @param diag.panel passed to splom
 #' @param split break diagonal names on white space
+#' @param main character, or a function of x, xvar
+#' @param sub character, or a function of x, xvar
 #' @param ... extra arguments passed to \code{\link[lattice]{splom}}
 #' @export
 #' @importFrom rlang UQS
@@ -27,7 +30,7 @@ corsplom <- function(x,...)UseMethod('corsplom')
 #' @family corsplom
 corsplom_data_frame <- function(
   x,
-  var = names(x),
+  xvar = names(x),
   upper.panel = u.p,
   lower.panel= l.p,
   pscales= 0,
@@ -35,10 +38,12 @@ corsplom_data_frame <- function(
   varname.cex = 1,
   diag.panel = my.diag.panel,
   split = TRUE,
+  main = getOption('metaplot_main',NULL),
+  sub = getOption('metaplot_sub',NULL),
   ...
 ){
   stopifnot(inherits(x, 'data.frame'))
-  x <- x[,var,drop=FALSE]
+  x <- x[,xvar,drop=FALSE]
   label <- lapply(x,attr,'label')
   label[sapply(label, is.null)] <- ''
   label <- as.character(label)
@@ -47,6 +52,10 @@ corsplom_data_frame <- function(
   names(x)[i] <- label[i]
 
   if(split) names(x) <- fracture(names(x))
+
+  if(!is.null(main))if(is.function(main)) main <- main(x = x, xvar = xvar, ...)
+  if(!is.null(sub))if(is.function(sub)) sub <- sub(x = x, xvar = xvar, ...)
+
   splom(
     x,
     upper.panel = upper.panel,
@@ -55,21 +64,16 @@ corsplom_data_frame <- function(
     xlab = xlab,
     varname.cex = varname.cex,
     diag.panel = diag.panel,
+    main = main,
+    sub = sub,
     ...
   )
 }
 #' Correlated Scatterplot Matrix Method for Data Frame
 #'
-#' Creates a scatterplot matrix using nonstandard evaluation.
+#' Creates a scatterplot matrix.  Parses arguments and generates the call: fun(x, xvar, ...).
 #' @param x data.frame
-#' @param ... variables to plot as unquoted character strings
-#' @param upper.panel passed to splom
-#' @param lower.panel passed to splom
-#' @param pscales passed to splom
-#' @param xlab passed to splom
-#' @param varname.cex passed to splom
-#' @param diag.panel passed to splom
-#' @param split break diagonal names on white space
+#' @param ... passed to fun
 #' @param fun function to do the actual plotting
 #' @export
 #' @importFrom rlang UQS quos
@@ -78,13 +82,6 @@ corsplom_data_frame <- function(
 corsplom.data.frame <- function(
   x,
   ...,
-  upper.panel = u.p,
-  lower.panel= l.p,
-  pscales= 0,
-  xlab = '',
-  varname.cex = 1,
-  diag.panel = my.diag.panel,
-  split = TRUE,
   fun = getOption('metaplot_corsplom','corsplom_data_frame')
 ){
   args <- quos(...)
@@ -92,28 +89,8 @@ corsplom.data.frame <- function(
   vars <- args[names(args) == '']
   other <- args[names(args) != '']
   vars <- sapply(vars, as.character)
-  prime <- list(x = x, var = vars)
-  formal <- list(
-   upper.panel = upper.panel,
-   lower.panel = lower.panel,
-   xlab = '',
-   varname.cex = varname.cex,
-   split = split
-  )
-  args <- c(prime, formal, other)
+  prime <- list(x = x, xvar = vars)
+  args <- c(prime, other)
   do.call(fun, args)
 }
 
-#' Correlated Splom for Folded
-#'
-#' Creates a scatterplot matrix with correlations for folded.
-#' Categoricals in \dots are currently ignored. dots (\dots) are
-#' names of items in VARIABLE to be plotted, or named arguments
-#' to be passed to data.frame method.
-#' @import lattice
-#' @export
-#' @family multivariate plots
-#' @family corsplom
-#' @param x folded
-#' @param ... unquoted names of variables to plot, or other named arguments
-corsplom.folded <- function(x, ...)corsplom(pack(x,...),...)

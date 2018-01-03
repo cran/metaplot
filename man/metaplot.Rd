@@ -19,11 +19,11 @@ example(metaplot.data.frame)
 }
 \seealso{
 Other generic functions: \code{\link{axislabel}},
-  \code{\link{corsplom}}, \code{\link{dens}},
-  \code{\link{guide}}, \code{\link{label}},
+  \code{\link{corsplom}}, \code{\link{densplot}},
   \code{\link{scatter}}
 
-Other metaplot: \code{\link{categorical}},
-  \code{\link{metaplot.data.frame}},
-  \code{\link{metaplot.folded}}
+Other metaplot: \code{\link{boxplot.data.frame}},
+  \code{\link{categorical}}, \code{\link{corsplom}},
+  \code{\link{densplot}},
+  \code{\link{metaplot.data.frame}}, \code{\link{scatter}}
 }
