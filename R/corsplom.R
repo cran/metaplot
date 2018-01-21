@@ -6,7 +6,6 @@
 #' @export
 #' @family generic functions
 #' @family corsplom
-#' @family metaplot
 corsplom <- function(x,...)UseMethod('corsplom')
 
 #' Correlated Scatterplot Matrix Function for Data Frame
@@ -16,11 +15,10 @@ corsplom <- function(x,...)UseMethod('corsplom')
 #' @param xvar variables to plot
 #' @param upper.panel passed to splom
 #' @param lower.panel passed to splom
-#' @param pscales passed to splom
-#' @param xlab passed to splom
-#' @param varname.cex passed to splom
 #' @param diag.panel passed to splom
-#' @param split break diagonal names on white space
+#' @param pscales passed to splom
+#' @param xlab passed to splom, can be function(x = x, var = xvar, ...)
+#' @param varname.cex passed to splom
 #' @param main character, or a function of x, xvar
 #' @param sub character, or a function of x, xvar
 #' @param ... extra arguments passed to \code{\link[lattice]{splom}}
@@ -28,44 +26,40 @@ corsplom <- function(x,...)UseMethod('corsplom')
 #' @importFrom rlang UQS
 #' @family multivariate plots
 #' @family corsplom
+#' @family metaplot
 corsplom_data_frame <- function(
   x,
   xvar = names(x),
-  upper.panel = u.p,
-  lower.panel= l.p,
-  pscales= 0,
-  xlab = '',
-  varname.cex = 1,
-  diag.panel = my.diag.panel,
-  split = TRUE,
+  upper.panel = getOption('metaplot_upper.panel',corsplom_panel_scatter),
+  lower.panel= getOption('metaplot_lower.panel',corsplom_panel_correlation),
+  diag.panel = getOption('metaplot_diag.panel',corsplom_panel_diagonal),
+  pscales= getOption('metaplot_pscales',0),
+  xlab = getOption('metaplot_corsplom_xlab',NULL),
+  varname.cex = getOption('metaplot_varname.cex',1),
   main = getOption('metaplot_main',NULL),
   sub = getOption('metaplot_sub',NULL),
   ...
 ){
+  if(is.character(xlab)) xlab <- tryCatch(match.fun(xlab), error = function(e)xlab)
+  if(is.function(xlab)) xlab <- xlab(x, xvar, ...)
+  if(is.null(xlab)) xlab <- ''
+
   stopifnot(inherits(x, 'data.frame'))
   x <- x[,xvar,drop=FALSE]
-  label <- lapply(x,attr,'label')
-  label[sapply(label, is.null)] <- ''
-  label <- as.character(label)
-  stopifnot(all(sapply(label,length) <= 1))
-  i <- is.defined(label) & label != ''
-  names(x)[i] <- label[i]
-
-  if(split) names(x) <- fracture(names(x))
-
   if(!is.null(main))if(is.function(main)) main <- main(x = x, xvar = xvar, ...)
   if(!is.null(sub))if(is.function(sub)) sub <- sub(x = x, xvar = xvar, ...)
-
   splom(
     x,
     upper.panel = upper.panel,
     lower.panel = lower.panel,
+    diag.panel = diag.panel,
     pscales = pscales,
     xlab = xlab,
     varname.cex = varname.cex,
-    diag.panel = diag.panel,
     main = main,
     sub = sub,
+    .data = x,
+    split = split,
     ...
   )
 }
@@ -79,6 +73,7 @@ corsplom_data_frame <- function(
 #' @importFrom rlang UQS quos
 #' @family multivariate plots
 #' @family corsplom
+#' @family methods
 corsplom.data.frame <- function(
   x,
   ...,

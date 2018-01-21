@@ -5,6 +5,8 @@
 #' @export
 #' @param x object
 #' @param ... other arguments
+#' @family generic functions
+#' @family pack
 pack <- function(x,...)UseMethod('pack')
 
 
@@ -15,11 +17,13 @@ pack <- function(x,...)UseMethod('pack')
 #' @param x data.frame
 #' @param meta column in x giving names of attributes
 #' @param as.is passed to \code{\link[utils]{read.table}}
+#' @param attributes preserve non-standard attributes (ignores names, row.names, class)
 #' @param ... ignored arguments
 #' @export
 #' @importFrom utils write.table read.table
 #' @return data.frame
 #' @family pack
+#' @family methods
 #' @examples
 #' foo <- data.frame(head(Theoph))
 #' attr(foo$Subject, 'label') <-  'subject identifier'
@@ -39,8 +43,12 @@ pack <- function(x,...)UseMethod('pack')
 #' bar <- unpack(foo)
 #' pack(bar)
 #' attributes(pack(bar)$Subject)
-pack.data.frame <- function(x, meta = getOption('meta','meta'), as.is = TRUE, ...){
+pack.data.frame <- function(x, meta = getOption('meta','meta'), as.is = TRUE, attributes = TRUE, ...){
   stopifnot(meta %in% names(x))
+  a <- attributes(x)
+  a$row.names <- NULL
+  a$names <- NULL
+  a$class <- NULL
   i <- x[[meta]]
   y <- x[!is.na(i),]
   x <- x[is.na(i),]
@@ -62,6 +70,7 @@ pack.data.frame <- function(x, meta = getOption('meta','meta'), as.is = TRUE, ..
       attr(x[[col]], attr) <- y[y$meta == attr, col]
     }
   }
+  if(attributes)for(at in names(a))attr(x,at) <- a[[at]]
   x
 }
 
@@ -70,6 +79,7 @@ pack.data.frame <- function(x, meta = getOption('meta','meta'), as.is = TRUE, ..
 #' Unpack Something.  Generic, with method for data.frame.
 #'
 #' @family pack
+#' @family generic functions
 #' @export
 #' @param x object
 #' @param ... other arguments
@@ -88,6 +98,7 @@ unpack <- function(x,...)UseMethod('unpack')
 #' @export
 #' @return data.frame
 #' @family pack
+#' @family methods
 #' @importFrom dplyr bind_rows bind_cols
 #' @return data.frame with all columns of class character
 unpack.data.frame <- function(x, meta = getOption('meta','meta'), position = 1L, ignore = c('class','levels'), ...){

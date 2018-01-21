@@ -4,9 +4,13 @@
 \alias{corsplom_data_frame}
 \title{Correlated Scatterplot Matrix Function for Data Frame}
 \usage{
-corsplom_data_frame(x, xvar = names(x), upper.panel = u.p,
-  lower.panel = l.p, pscales = 0, xlab = "", varname.cex = 1,
-  diag.panel = my.diag.panel, split = TRUE,
+corsplom_data_frame(x, xvar = names(x),
+  upper.panel = getOption("metaplot_upper.panel", corsplom_panel_scatter),
+  lower.panel = getOption("metaplot_lower.panel", corsplom_panel_correlation),
+  diag.panel = getOption("metaplot_diag.panel", corsplom_panel_diagonal),
+  pscales = getOption("metaplot_pscales", 0),
+  xlab = getOption("metaplot_corsplom_xlab", NULL),
+  varname.cex = getOption("metaplot_varname.cex", 1),
   main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
   NULL), ...)
 }
@@ -19,15 +23,13 @@ corsplom_data_frame(x, xvar = names(x), upper.panel = u.p,
 
 \item{lower.panel}{passed to splom}
 
-\item{pscales}{passed to splom}
-
-\item{xlab}{passed to splom}
-
-\item{varname.cex}{passed to splom}
-
 \item{diag.panel}{passed to splom}
 
-\item{split}{break diagonal names on white space}
+\item{pscales}{passed to splom}
+
+\item{xlab}{passed to splom, can be function(x = x, var = xvar, ...)}
+
+\item{varname.cex}{passed to splom}
 
 \item{main}{character, or a function of x, xvar}
 
@@ -44,4 +46,8 @@ Other multivariate plots: \code{\link{corsplom.data.frame}},
 
 Other corsplom: \code{\link{corsplom.data.frame}},
   \code{\link{corsplom}}
+
+Other metaplot: \code{\link{boxplot_data_frame}},
+  \code{\link{densplot_data_frame}},
+  \code{\link{metaplot}}, \code{\link{scatter_data_frame}}
 }

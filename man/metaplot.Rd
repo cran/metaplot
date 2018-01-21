@@ -12,18 +12,108 @@ metaplot(x, ...)
 \item{...}{passed arguments}
 }
 \description{
-Creates a metaplot. Generic.  See \code{\link{metaplot.data.frame}}.
+Metaplot creates univariate, bivariate, or multivariate plots depending on the number and types of variables represented by the anonymous arguments.  Types are either numeric (NUM, e.g. real, integer) or categorical (CAT, e.g. factor, character).  A variable stored as numeric that nonetheless has an \code{\link[encode]{encode}}d \code{guide} attribute will be treated as categorical. Mnemonic: \code{ x \%>\% metaplot(yvars, xvar, groupvar, facets)} where arguments are unquoted column names, and only xvar is required.  Column attributes \code{label}, \code{guide}, \code{reference}, and \code{symbol} modify the behavior of the default handlers.
+}
+\details{
+Design your plot by specifying y variables (optional), the x variable, the groups variable (optional) and the conditioning variables (i.e., facets, optional).
+
+The single groups variable, if any, is the first categorical in the third position or later. An earlier categorical gives a "mixed" bivariate plot, e.g. horizontal boxplot (first position) or vertical boxplot (second postion).
+
+The x variable is the last variable before groups, if present.
+
+The y variables are those before x. If none, the result is univariate. If one, the result is typically a boxplot or scatterplot, depending on x. Several numeric y followed by a numeric x are treated as multivariate (scatterplot matrix).  But if all y have the same \code{guide} attribute and it is different from that for x, the result is bivariate (i.e, an \code{overlay} scatterplot).
+
+Wherever a groups argument is meaningful, it may be missing.  This allows specification of facets in the absence of groups, e.g., \code{(metaplot(y, x, , facet1, facet2))}.  For multiple y (overlay), the sources of y are the implied groups: any trailing categorical arguments are treated as facets.
+
+Template designs follow; substitute behaviors by setting global options (see argument list).
+
+\itemize{
+\item{NUM:}{ univariate (densityplot) }
+
+\item{CAT:}{ categorical (unimplemented) }
+
+\item{CAT, CAT:}{ categorical (unimplemented)}
+
+\item{NUM, CAT:}{ mixedvariate (vertical boxplot)}
+
+\item{CAT, NUM:}{ mixedvariate (horizontal boxplot)}
+
+\item{CAT, NUM, CAT:}{ mixedvariate with one facet}
+
+\item{NUM, NUM:}{ bivariate (scatterplot)}
+
+\item{NUM, NUM, CAT:}{ grouped bivariate (grouped scatterplot)}
+
+\item{NUM, NUM,, CAT:}{ non-grouped bivariate with one facet}
+
+\item{NUM, NUM, CAT, CAT:}{ grouped bivariate with one facet}
+
+\item{NUM, NUM, CAT, CAT, CAT:}{ grouped bivariate with two facets}
+
+\item{NUM, NUM, NUM:}{ multivariate, or grouped bivariate for \code{overlay}}
+
+\item{NUM, NUM, NUM, CAT}{ multivariate, or faceted bivariate for \code{overlay}}
+
+\item{NUM, NUM, NUM, CAT, CAT}{ multivariate, or bivariate with two facets for \code{overlay}}
+
+}
+
+Variable attributes may be supplied by conventional means;  \code{\link{pack}} and \code{\link{unpack}} support storing and retrieving scalar column attributes.  The following scalar attributes are currently supported.
+\itemize{
+\item{label:}{ A variable descriptor.  If present, panel functions will use label to create informative axis labels. See \code{\link{axislabel}}. }
+\item{guide:}{ Units for a numeric variable, or an encoding (scalar string giving codes and possibly decodes) for a categorical item.  If present, units will be used to inform the corresponding axis label (\code{\link{axislabel}}).  If present, codes will be used to impose sort order on categorical variables.  If present, decodes will be used as substitutes for stored values when presenting categorical labels, legends, and facet names. For more on encodings, see \code{\link[encode]{encode}}.}
+\item{reference:}{ Some variables have values to which they can be compared.  For example, residual error is often expected to be centered at zero. Default panel functions plot corresponding reference lines if this attribute is present. See for example \code{\link{dens_panel}}.}
+\item{symbol:}{ Variable names are useful for programming, and variable labels are useful as axis labels.  A symbol can be more formal than a variable name and more compact than a label.  For example, \code{\link{diag_label}} will use variable names as labels for the diagonal panels of a scatterplot matrix; but it will prefer labels, if available; and will prefer symbols most of all. Markup rules for symbols are given in \code{\link{wikisym2plotmathOne}}.}
+}
 }
 \examples{
-example(metaplot.data.frame)
+
+library(magrittr)
+library(dplyr)
+library(csv)
+x <- as.csv(system.file(package = 'metaplot', 'extdata/theoph.csv'))
+x \%<>\% pack
+# sample plots
+x \%>\% metaplot(sres)
+#x \%>\% metaplot(site)
+x \%>\% metaplot(Wt, arm)
+x \%>\% densplot(Wt, arm)
+x \%>\% metaplot(arm, Wt)
+x \%>\% metaplot(Wt, arm, site, ref = 70)
+x \%>\% metaplot(Wt, site, arm, ref = 70)
+x \%>\% metaplot(conc, Time)
+x \%>\% metaplot(conc, Time, panel = panel.smoothScatter)
+#x \%>\% metaplot(arm, site)
+x \%>\% metaplot(conc, Time, Subject)
+x \%>\% metaplot(conc, Time, , Subject)
+x \%>\% metaplot(conc, Time, Subject, site)
+x \%>\% metaplot(conc, Time, Subject, site, arm)
+x \%>\% metaplot(lKe, lKa, lCl)
+x \%>\% metaplot(
+  lKe, lKa, lCl,
+  col = 'black',loess.col = 'red', pin.col = 'red',
+  dens.col='blue',dens.alpha = 0.1
+)
+x \%>\% metaplot(conc, pred, ipred, Time)
+x \%>\% metaplot(conc, pred, ipred, Time, Subject)
+x \%>\% metaplot(conc, pred, ipred, Time, Subject,
+colors = c('black','blue','magenta'),
+points = c(0.9,0, 0.4),
+lines = c(F,T,T))
+x \%>\% metaplot(conc, ipred, Time, site, arm)
+x \%>\% metaplot(res, conc, yref = 0, ysmooth = T, conf = T, grid = T, loc = 1)
+x \%>\% metaplot(res, conc, arm, ysmooth = T, conf = T )
+x \%>\% metaplot(res, conc, arm, ysmooth = T, conf = T, global = T, refcol = 'red')
+
 }
 \seealso{
 Other generic functions: \code{\link{axislabel}},
-  \code{\link{corsplom}}, \code{\link{densplot}},
-  \code{\link{scatter}}
-
-Other metaplot: \code{\link{boxplot.data.frame}},
   \code{\link{categorical}}, \code{\link{corsplom}},
-  \code{\link{densplot}},
-  \code{\link{metaplot.data.frame}}, \code{\link{scatter}}
+  \code{\link{densplot}}, \code{\link{pack}},
+  \code{\link{scatter}}, \code{\link{unpack}}
+
+Other metaplot: \code{\link{boxplot_data_frame}},
+  \code{\link{corsplom_data_frame}},
+  \code{\link{densplot_data_frame}},
+  \code{\link{scatter_data_frame}}
 }

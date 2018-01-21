@@ -4,9 +4,20 @@
 \alias{boxplot_data_frame}
 \title{Boxplot Function for Data Frame}
 \usage{
-boxplot_data_frame(x, yvar, xvar, facets = NULL, log = FALSE,
-  horizontal = NULL, crit = 1.3, ref = NULL, nobs = FALSE,
-  na.rm = TRUE, xlab = NULL, ylab = NULL, aspect = 1,
+boxplot_data_frame(x, yvar, xvar, facets = NULL,
+  log = getOption("metaplot_log", FALSE),
+  horizontal = getOption("metaplot_horizontal", NULL),
+  crit = getOption("metaplot_crit", 1.3),
+  panel = getOption("metaplot_boxplot_panel", boxplot_panel),
+  ref = getOption("metaplot_ref", metaplot_ref),
+  ref.col = getOption("metaplot_ref.col", "grey"),
+  ref.lty = getOption("metaplot_ref.lty", "solid"),
+  ref.alpha = getOption("metaplot_ref.alpha", 1),
+  nobs = getOption("metaplot_nobs", FALSE),
+  na.rm = getOption("metaplot_na.rm", TRUE), xlab = NULL, ylab = NULL,
+  numlab = getOption("metaplot_lab", axislabel),
+  catlab = getOption("metaplot_lab", axislabel),
+  aspect = getOption("metaplot_aspect", 1),
   main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
   NULL), ...)
 }
@@ -25,15 +36,27 @@ boxplot_data_frame(x, yvar, xvar, facets = NULL, log = FALSE,
 
 \item{crit}{if log is NULL, log-transform if mean/median ratio for non-missing x is greater than this value}
 
-\item{ref}{optional reference line on numeric axis}
+\item{panel}{panel function}
+
+\item{ref}{optional reference line(s) on numeric axis; can be function(x = x, var = con, ...)}
+
+\item{ref.col}{color for reference line(s)}
+
+\item{ref.lty}{line type for reference line(s)}
+
+\item{ref.alpha}{transparency for reference line(s)}
 
 \item{nobs}{whether to include the number of observations under the category label}
 
 \item{na.rm}{whether to remove data points with one or more missing coordinates}
 
-\item{xlab}{passed to \code{\link[lattice]{bwplot}}}
+\item{xlab}{x axis label}
 
-\item{ylab}{passed to \code{\link[lattice]{bwplot}}}
+\item{ylab}{y axis label}
+
+\item{numlab}{numeric axis label; can be function(x = x, var = numvar, log = ylog, ...)}
+
+\item{catlab}{categorical axis label; can be function(x = x, var = catvar, ...)}
 
 \item{aspect}{passed to \code{\link[lattice]{bwplot}}}
 
@@ -44,7 +67,7 @@ boxplot_data_frame(x, yvar, xvar, facets = NULL, log = FALSE,
 \item{...}{passed arguments}
 }
 \description{
-Boxplot for data.frame. Uses standard evaluation.
+Boxplot for data.frame. Creates a boxplot using \code{boxplot_panel} by default.
 }
 \examples{
 library(magrittr)
@@ -54,7 +77,12 @@ boxplot_data_frame(Theoph \%>\% filter(conc > 0),
 'conc','Subject', log = TRUE, ref = c(2,5),horizontal = FALSE)
 }
 \seealso{
-Other mixedvariate plots: \code{\link{boxplot.data.frame}}
+Other mixedvariate plots: \code{\link{boxplot.data.frame}},
+  \code{\link{boxplot_panel}}
 
 Other boxplot: \code{\link{boxplot.data.frame}}
+
+Other metaplot: \code{\link{corsplom_data_frame}},
+  \code{\link{densplot_data_frame}},
+  \code{\link{metaplot}}, \code{\link{scatter_data_frame}}
 }
