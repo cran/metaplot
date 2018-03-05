@@ -1,6 +1,6 @@
-8fe723ee3a18470e172eeba2b4178a8d *DESCRIPTION
+be702e47f45efa4d8cf09488b9ad278e *DESCRIPTION
 18abbc0976f18bf45dbc7bce06bf4a87 *NAMESPACE
-4832bbd0dabf1c29a7a2a6d125386a5e *R/box.R
+f3209dd1281bc7c4b4f8a960f4ec2c43 *R/box.R
 ed2346105c129650e91823ffef98fe69 *R/categorical.R
 c5fd523b0516b6c6f7f1cb7156eb38f8 *R/corsplom.R
 2132c1063489e6f670f193f57550a264 *R/density.R
@@ -14,7 +14,7 @@ d96adb952f75ff21ae6f67e3ec614560 *man/axislabel.Rd
 1f41269777aa60a33f73eb81c1080671 *man/axislabel.data.frame.Rd
 35d62e8df9d234c221579a9e637dfd9c *man/boxplot.Rd
 40bc54eb824e182feed882e7ebc54028 *man/boxplot.data.frame.Rd
-d835dea8fabddc0af215cf73d853b999 *man/boxplot_data_frame.Rd
+f53d8ca0440c9e8ce3603429010dcf2a *man/boxplot_data_frame.Rd
 cd2a980dc5ff82bdbbd6a7e5cf3919ac *man/boxplot_panel.Rd
 5156c239574a7f675ab8f0552ae96b49 *man/categorical.Rd
 90d3a95802207b31a8a5a3fda8806eac *man/categorical.data.frame.Rd
