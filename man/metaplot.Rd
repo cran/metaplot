@@ -90,7 +90,7 @@ x \%>\% metaplot(arm, conc)
 x \%>\% metaplot(conc, arm, site)
 x \%>\% metaplot(conc, site, arm)
 x \%>\% metaplot(conc, time)
-x \%>\% metaplot(conc, time, panel = panel.smoothScatter)
+# x \%>\% metaplot(conc, time, panel = panel.smoothScatter)
 x \%>\% metaplot(arm, site)
 x \%>\% metaplot(arm, site, cohort)
 x \%>\% metaplot(arm, site, , cohort)
@@ -115,6 +115,19 @@ x \%>\% metaplot(res, conc, yref = 0, ysmooth = T, conf = T, grid = T, loc = 1)
 x \%>\% metaplot(res, conc, arm, ysmooth = T, conf = T )
 x \%>\% metaplot(res, conc, arm, ysmooth = T, conf = T, global = T, ref.col = 'red')
 x \%>\% metaplot(subject,conc)
+
+# manage metadata
+attr(x$arm, 'guide') # //1/Arm A//2/Arm B//
+x \%>\% metaplot(conc, arm) # default
+
+x \%>\% mutate(arm = arm \%>\%
+structure(guide = '//2/Arm B//1/Arm A//')) \%>\%
+metaplot(conc, arm) # different presentation order
+
+x \%>\% mutate(arm = arm \%>\%
+structure(guide = '//1/Both Arms//2/Both Arms//')) \%>\%
+metaplot(conc, arm) # collapse cases
+
 
 }
 \seealso{
