@@ -18,9 +18,11 @@ Scatterplot.
 Other generic functions: \code{\link{axislabel}},
   \code{\link{categorical}}, \code{\link{corsplom}},
   \code{\link{densplot}}, \code{\link{metaplot}},
-  \code{\link{pack}}, \code{\link{unpack}}
+  \code{\link{pack}}, \code{\link{test_metaplot}},
+  \code{\link{unpack}}
 
-Other scatter: \code{\link{scatter.data.frame}},
+Other scatter: \code{\link{metaplot_key}},
+  \code{\link{scatter.data.frame}},
   \code{\link{scatter_data_frame}},
   \code{\link{scatter_panel}}
 

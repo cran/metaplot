@@ -9,7 +9,8 @@
   mixedvariate = getOption("metaplot_mixedvariate", "boxplot"),
   bivariate = getOption("metaplot_bivariate", "scatter"),
   multivariate = getOption("metaplot_multivariate", "corsplom"),
-  categorical = getOption("metaplot_categorical", "categorical"))
+  categorical = getOption("metaplot_categorical", "categorical"),
+  verbose = getOption("metaplot_verbose", FALSE))
 }
 \arguments{
 \item{x}{object}
@@ -25,6 +26,8 @@
 \item{multivariate}{function for more than two numeric arguments}
 
 \item{categorical}{function for categorical arguments}
+
+\item{verbose}{generate messages describing process; passed to called functions if explicitly supplied}
 }
 \description{
 Creates a metaplot for class 'data.frame'.  Implements a rule to decided whether to make a density plot, a boxplot, a scatter plot, or a scatterplot matrix, given the supplied column names.
@@ -118,12 +121,12 @@ y$arm <- as.factor(y$arm)
 y$site <- as.factor(y$site)
 y$subject <- as.factor(y$subject)
 y \%>\% metaplot(conc)
-#y \%>\% metaplot(site)
+y \%>\% metaplot(site)
 y \%>\% metaplot(wt, arm)
 y \%>\% metaplot(arm, wt)
 y \%>\% metaplot(arm, wt,site)
 y \%>\% metaplot(conc, time)
-#y \%>\% metaplot(arm, site)
+y \%>\% metaplot(arm, site)
 y \%>\% metaplot(conc, time, subject)
 y \%>\% metaplot(conc, time, , subject)
 y \%>\% metaplot(conc, time, subject, site)
@@ -145,12 +148,16 @@ Other methods: \code{\link{axislabel.data.frame}},
   \code{\link{corsplom.data.frame}},
   \code{\link{densplot.data.frame}},
   \code{\link{pack.data.frame}},
+  \code{\link{plot.metaplot_gtable}},
+  \code{\link{print.metaplot_gtable}},
   \code{\link{scatter.data.frame}},
   \code{\link{unpack.data.frame}}
 
 Other univariate plots: \code{\link{dens_panel}},
   \code{\link{densplot.data.frame}},
-  \code{\link{densplot_data_frame}}, \code{\link{densplot}}
+  \code{\link{densplot_data_frame}},
+  \code{\link{densplot}},
+  \code{\link{panel.meta_densityplot}}
 
 Other bivariate plots: \code{\link{iso_prepanel}},
   \code{\link{scatter.data.frame}},

@@ -81,6 +81,10 @@ library(dplyr)
 library(csv)
 x <- as.csv(system.file(package = 'metaplot', 'extdata/theoph.csv'))
 x \%<>\% pack
+# options(metaplot_gg = TRUE)
+# options(metaplot_verbose = TRUE)  # all messages; equiv. to metaplot(verbose = T,...)
+# options(metaplot_verbose_ = TRUE) # plot function messages
+# options(metaplot_verbose_densplot = TRUE) # densplot messages
 # sample plots
 x \%>\% metaplot(sres)
 x \%>\% metaplot(site)
@@ -90,27 +94,33 @@ x \%>\% metaplot(arm, conc)
 x \%>\% metaplot(conc, arm, site)
 x \%>\% metaplot(conc, site, arm)
 x \%>\% metaplot(conc, time)
-# x \%>\% metaplot(conc, time, panel = panel.smoothScatter)
 x \%>\% metaplot(arm, site)
 x \%>\% metaplot(arm, site, cohort)
+x \%>\% metaplot(arm, site, cohort, space = 'top')
 x \%>\% metaplot(arm, site, , cohort)
 x \%>\% metaplot(conc, time, subject)
 x \%>\% metaplot(conc, time, , subject)
 x \%>\% metaplot(conc, time, subject, site)
 x \%>\% metaplot(conc, time, subject, site, arm)
 x \%>\% metaplot(lKe, lKa, lCl)
+
+\donttest{
 x \%>\% metaplot(
   lKe, lKa, lCl,
-  col = 'black',loess.col = 'red', pin.col = 'red',
+  col = 'black',smooth.col = 'red', pin.col = 'red',
   dens.col='blue',dens.alpha = 0.1
 )
-x \%>\% metaplot(conc, pred, ipred, time)
-x \%>\% metaplot(conc, pred, ipred, time, subject)
+x \%>\% metaplot(conc, pred, ipred, time, space = 'top')
+x \%>\% metaplot(conc, pred, ipred, time, subject, space = 'top')
 x \%>\% metaplot(conc, pred, ipred, time, subject,
-colors = c('black','blue','magenta'),
-points = c(0.9,0, 0.4),
-lines = c(F,T,T))
-x \%>\% metaplot(conc, ipred, time, site, arm)
+  colors = c('black','blue','orange'),
+  points = c(0.9,0, 0.4),
+  lines = c(F,T,T),
+  types = c('blank','dashed','solid'),
+  space = 'top'
+)
+
+x \%>\% metaplot(conc, ipred, time, site, arm, space = 'top')
 x \%>\% metaplot(res, conc, yref = 0, ysmooth = T, conf = T, grid = T, loc = 1)
 x \%>\% metaplot(res, conc, arm, ysmooth = T, conf = T )
 x \%>\% metaplot(res, conc, arm, ysmooth = T, conf = T, global = T, ref.col = 'red')
@@ -118,27 +128,32 @@ x \%>\% metaplot(subject,conc)
 
 # manage metadata
 attr(x$arm, 'guide') # //1/Arm A//2/Arm B//
+
 x \%>\% metaplot(conc, arm) # default
 
 x \%>\% mutate(arm = arm \%>\%
-structure(guide = '//2/Arm B//1/Arm A//')) \%>\%
-metaplot(conc, arm) # different presentation order
+  structure(guide = '//2/Arm B//1/Arm A//')) \%>\%
+  metaplot(conc, arm) # different presentation order
 
 x \%>\% mutate(arm = arm \%>\%
-structure(guide = '//1/Both Arms//2/Both Arms//')) \%>\%
-metaplot(conc, arm) # collapse cases
+  structure(guide = '//1/Both Arms//2/Both Arms//')) \%>\%
+  metaplot(conc, arm) # collapse cases
 
 
+}
 }
 \seealso{
 Other generic functions: \code{\link{axislabel}},
   \code{\link{categorical}}, \code{\link{corsplom}},
   \code{\link{densplot}}, \code{\link{pack}},
-  \code{\link{scatter}}, \code{\link{unpack}}
+  \code{\link{scatter}}, \code{\link{test_metaplot}},
+  \code{\link{unpack}}
 
 Other metaplot: \code{\link{boxplot_data_frame}},
   \code{\link{categorical_data_frame}},
   \code{\link{corsplom_data_frame}},
   \code{\link{densplot_data_frame}},
-  \code{\link{scatter_data_frame}}
+  \code{\link{metaplot_key}},
+  \code{\link{scatter_data_frame}},
+  \code{\link{test_metaplot}}
 }

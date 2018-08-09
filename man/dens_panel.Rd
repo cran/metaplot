@@ -4,7 +4,7 @@
 \alias{dens_panel}
 \title{Panel Function for Metaplot Density Plot}
 \usage{
-dens_panel(ref = NULL, ref.col, ref.lty, ref.alpha, ...)
+dens_panel(ref = NULL, ref.col, ref.lty, ref.lwd, ref.alpha, ...)
 }
 \arguments{
 \item{ref}{numeric}
@@ -12,6 +12,8 @@ dens_panel(ref = NULL, ref.col, ref.lty, ref.alpha, ...)
 \item{ref.col}{passed to \code{\link[lattice]{panel.abline}} as col}
 
 \item{ref.lty}{passed to \code{\link[lattice]{panel.abline}} as lty}
+
+\item{ref.lwd}{passed to \code{\link[lattice]{panel.abline}} as lwd}
 
 \item{ref.alpha}{passed to \code{\link[lattice]{panel.abline}} as alpha}
 }
@@ -21,17 +23,24 @@ Default panel function for dens_data_frame.  Calls panel.densityplot, and plots 
 \seealso{
 Other panel functions: \code{\link{boxplot_panel}},
   \code{\link{categorical_panel}},
+  \code{\link{corsplom_gg_correlation}},
+  \code{\link{corsplom_gg_diagonal}},
+  \code{\link{corsplom_gg_scatter}},
   \code{\link{corsplom_panel_correlation}},
   \code{\link{corsplom_panel_diagonal}},
   \code{\link{corsplom_panel_scatter}},
   \code{\link{diag_label}}, \code{\link{diag_pin}},
-  \code{\link{iso_prepanel}}, \code{\link{metaplot_ref}},
+  \code{\link{iso_prepanel}}, \code{\link{metaplot_key}},
+  \code{\link{metaplot_ref}},
+  \code{\link{panel.meta_densityplot}},
   \code{\link{panel_tile}},
   \code{\link{scatter_panel_ref}},
   \code{\link{scatter_panel}}
 
 Other univariate plots: \code{\link{densplot.data.frame}},
   \code{\link{densplot_data_frame}},
-  \code{\link{densplot}}, \code{\link{metaplot.data.frame}}
+  \code{\link{densplot}},
+  \code{\link{metaplot.data.frame}},
+  \code{\link{panel.meta_densityplot}}
 }
 \keyword{internal}

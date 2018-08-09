@@ -51,24 +51,27 @@ axislabel.data.frame <- function(x, var, log = FALSE, ...){
 #' @param x x values
 #' @param y y values
 #' @param col point color
-#' @param loess.col loess color
-#' @param loess.lty loess line type
-#' @param loess.alpha loess alpha
+#' @param smooth.col smooth color
+#' @param smooth.lty smooth line type
+#' @param smooth.lwd smooth line size
+#' @param smooth.alpha smooth alpha
 #' @param ... passed arguments
 #' @keywords internal
 #' @export
 #' @family panel functions
+#' @family corsplom
 corsplom_panel_scatter = function(
   x,
   y,
-  col = '#0080ff',
-  loess.col = getOption('metaplot_loess.col',col),
-  loess.lty = getOption('metaplot_loess.lty','solid'),
-  loess.alpha = getOption('metaplot_loess.alpha',1),
+  col = metOption('metaplot_point_col_corsplom_panel','#0080ff'),
+  smooth.col = metOption('metaplot_smooth_col_corsplom_panel',col),
+  smooth.lty = metOption('metaplot_smooth_lty_corspom_panel','solid'),
+  smooth.lwd = metOption('metaplot_smooth_lwd_corspom_panel',1),
+  smooth.alpha = metOption('metaplot_smooth_alpha_corsplom_panel',1),
   ...
 ){
   panel.xyplot(x,y,col = col, ...)
-  panel.loess(x,y,col = loess.col, lty = loess.lty, alpha = loess.alpha)
+  try(silent = TRUE, suppressWarnings(panel.loess(x,y,col = smooth.col, lty = smooth.lty, lwd = smooth.lwd, alpha = smooth.alpha)))
 }
 
 #' Correlation Panel Function for Metaplot Corsplom
@@ -76,16 +79,20 @@ corsplom_panel_scatter = function(
 #' Default lower panel function for corsplom_data_frame. Plots Pearson correlation coefficient.
 #' @param x x values
 #' @param y y values
+#' @param use passed to \code{\link[stats]{cor}}
 #' @param ... passed arguments
 #' @keywords internal
 #' @export
 #' @family panel functions
-corsplom_panel_correlation = function(x, y, ...) {
+#' @family corsplom
+corsplom_panel_correlation = function(x, y, use = 'pairwise.complete.obs',...) {
   x1 <- range(x,na.rm = T)
   y1 <- range(y,na.rm = T)
   x0 <- min(x1)+(max(x1)-min(x1))/2
   y0 <- min(y1)+(max(y1)-min(y1))/2
-  panel.text(x0 ,y0, labels = paste('r =',round(cor(x,y),2) ))
+  stat <- try(silent = TRUE, round(cor(x,y, use = use), 3))
+  if(class(stat) == 'try-error') stat <- ''
+  panel.text(x0 ,y0, labels = paste('r =',round(cor(x,y,use = use),3) ))
 }
 
 #' Diagonal Panel Function for Metaplot Corsplom
@@ -102,6 +109,8 @@ corsplom_panel_correlation = function(x, y, ...) {
 #' @param dens.col color for density region
 #' @param dens.scale inflation factor for height of density smooth
 #' @param dens.alpha alpha transparency for density region
+#' @param as.table diagonal arranged top-left to bottom-right
+#' @param dens.up whether density plots should face the upper triangle (or lower, if FALSE)
 #' @param ... passed arguments
 #' @keywords internal
 #' @export
@@ -112,60 +121,163 @@ corsplom_panel_diagonal <- function(
   varname,
   .data,
   density = TRUE,
-  diag.label = getOption('metaplot_diag.label',diag_label),
-  pin = getOption('metaplot_pin',diag_pin),
-  pin.col = getOption('metaplot_pin.col','darkgrey'),
-  pin.alpha = getOption('metaplot_pin.alpha',1),
-  dens.col = getOption('metaplot_dens.col','grey'),
-  dens.scale = getOption('metaplot_dens.scale',0.2),
-  dens.alpha = getOption('metaplot_dens.alpha',0.5),
+  diag.label = metOption('metaplot_diag_label_corsplom_panel',diag_label),
+  pin = metOption('metaplot_pin_loc_corsplom_panel',diag_pin),
+  pin.col = metOption('metaplot_pin_col_corsplom_panel','darkgrey'),
+  pin.alpha = metOption('metaplot_pin_alpha_corsplom_panel',1),
+  dens.col = metOption('metaplot_dens_col_corsplom_panel','grey'),
+  dens.scale = metOption('metaplot_dens_scale_corsplom_panel',0.2),
+  dens.alpha = metOption('metaplot_dens_alpha_corsplom_panel',0.5),
+  as_table = metOption('metaplot_astable_corsplom_panel', FALSE),
+  dens.up = metOption('metaplot_densup_corsplom_panel',TRUE),
   ...
 ){
-  if(density){
-    d <- density(x,na.rm=TRUE)
-    lim <- current.panel.limits()$x
-    lo <- lim[[1]]
-    hi <- lim[[2]]
-    len <- hi - lo
+  as.table <- as_table
+  i <- match(varname,names(.data))
+  ncol <- length(names(.data))
 
-    x1 <- d$x
-    y1 <- d$y
-    y1 <- y1 / max(y1,na.rm = TRUE)
-    y1 <- y1 * len * dens.scale
-    z1 <- hi - y1
-    y1 <- y1 + lo
-    lpolygon(
-      x = x1,
-      y = z1,
-      col = dens.col,
-      border = NA,
-      alpha = dens.alpha
+  top <- FALSE
+  right <- FALSE
+  bottom <- FALSE
+  left <- FALSE
+  if(as.table & dens.up){
+    top  <-  i != 1
+    right <- i != ncol
+  }
+  if(!as.table & dens.up){
+    top   <- i != ncol
+    left  <- i != 1
+  }
+  if(as.table & !dens.up){
+    bottom <- i != ncol
+    left <- i != 1
+  }
+  if(!as.table & !dens.up){
+    bottom <- i != 1
+    right  <- i != ncol
+  }
+
+  mask <- c(top, right, bottom, left)
+  names(mask) <- c('top','right','bottom','left')
+  stopifnot(is.logical(density))
+  density <- rep(density, length.out = 4)
+  names(density) <- c('top','right','bottom','left')
+
+  density <- mask & density
+
+  #x <- as.character(mapping$x)
+  #data$x <- data[[x]]
+  #lim <- range(data$x,na.rm = TRUE)
+  lim <- current.panel.limits()$x
+  lo <- lim[[1]]
+  hi <- lim[[2]]
+  len <- hi - lo
+  me <- hi/2 + lo/2
+  d <- density(x,na.rm=TRUE, from = lo, to = hi)
+  #d <- density(x,na.rm=TRUE)
+  d <- data.frame(x1 = d$x, y1 = d$y)
+  # ensure start and end points are minima
+  bottom <- rbind(
+    data.frame(x1 = d$x1[[1]], y1 = min(d$y1)),
+    d,
+    data.frame(x1 = d$x1[[nrow(d)]], y1 = min(d$y1))
+  )
+  bottom %<>% mutate(y1 = y1 / max(y1, na.rm = TRUE)) # normalized
+  bottom %<>% mutate(y1 = y1 * len * dens.scale)      # scaled
+  bottom %<>% mutate(y1 = y1 + lo)                    # offset
+  top <- bottom %>% mutate(y1 = hi - y1 + lo)              # inverted
+  left <- bottom %>% mutate(z1 = y1, y1 = x1, x1 = z1)         # rotated
+  right <- left %>% mutate(x1 = hi - x1 + lo)              # inverted
+
+  if(density[['top']])lpolygon(
+    x = top$x1,
+    y = top$y1,
+    col = dens.col,
+    border = NA,
+    alpha = dens.alpha
+  )
+  if(density[['right']])lpolygon(
+    x = right$x1,
+    y = right$y1,
+    col = dens.col,
+    border = NA,
+    alpha = dens.alpha
+  )
+  if(density[['bottom']])lpolygon(
+    x = bottom$x1,
+    y = bottom$y1,
+    col = dens.col,
+    border = NA,
+    alpha = dens.alpha
+  )
+  if(density[['left']])lpolygon(
+    x = left$x1,
+    y = left$y1,
+    col = dens.col,
+    border = NA,
+    alpha = dens.alpha
+  )
+
+  if(is.character(pin))pin <- match.fun(pin)
+  if(is.function(pin)) pin <- pin(x = x, varname = varname, .data = .data, ...)
+  ref <- pin
+  ref <- as.numeric(ref)
+  ref <- ref[is.defined(ref)]
+  if(length(ref) && any(density)){
+    bottom <- data.frame(
+      x0 = ref,
+      x1 = ref,
+      y0 = rep(lo, length(ref)),
+      y1 = rep(lo + len * dens.scale, length(ref))
     )
-    lpolygon(
-      y = x1,
-      x = y1,
-      col = dens.col,
-      border = NA,
-      alpha = dens.alpha
+    top <- bottom %>% mutate(
+      y0 = hi - y0 + lo,
+      y1 = hi - y1 + lo
+    )
+    left <- bottom %>% mutate(
+      z0 = x0, x0 = y0, z1 = x1, x1 = y1, y0 = z0, y1 = z1
+    )
+    right <- left %>% mutate(
+      x0 = hi - x0 + lo,
+      x1 = hi - x1 + lo
     )
 
-    if(is.character(pin))pin <- match.fun(pin)
-    if(is.function(pin)) pin <- pin(x = x, varname = varname, .data = .data, ...)
-    ref <- pin
-    ref <- as.numeric(ref)
-    ref <- ref[is.defined(ref)]
-    if(length(ref)){
-      x0 = ref
-      x1 = ref
-      y0 = rep(hi, length(ref))
-      y1 = rep(hi - len * dens.scale, length(ref))
-      lsegments(y0 = y0, y1 = y1, x0 = x0, x1 = x1, col = pin.col, alpha = pin.alpha)
-      y0 = ref
-      y1 = ref
-      x0 = rep(lo, length(ref))
-      x1 = rep(lo + len * dens.scale, length(ref))
-      lsegments(x0 = x0, x1 = x1, y0 = y0,y1 = y1, col = pin.col ,alpha = pin.alpha)
-    }
+    # x0 = ref
+    # x1 = ref
+    # y0 = rep(hi, length(ref))
+    # y1 = rep(hi - len * dens.scale, length(ref))
+    if(density[['top']])lsegments(
+      y0 = top$y0,
+      y1 = top$y1,
+      x0 = top$x0,
+      x1 = top$x1,
+      col = pin.col,
+      alpha = pin.alpha
+    )
+    if(density[['right']])lsegments(
+      y0 = right$y0,
+      y1 = right$y1,
+      x0 = right$x0,
+      x1 = right$x1,
+      col = pin.col,
+      alpha = pin.alpha
+    )
+    if(density[['bottom']])lsegments(
+      y0 = bottom$y0,
+      y1 = bottom$y1,
+      x0 = bottom$x0,
+      x1 = bottom$x1,
+      col = pin.col,
+      alpha = pin.alpha
+    )
+    if(density[['left']])lsegments(
+      y0 = left$y0,
+      y1 = left$y1,
+      x0 = left$x0,
+      x1 = left$x1,
+      col = pin.col,
+      alpha = pin.alpha
+    )
   }
   if(is.character(diag.label))diag.label <- match.fun(diag.label)
   if(is.function(diag.label))diag.label <- diag.label(varname = varname, .data = .data, ...)
@@ -237,9 +349,9 @@ scatter_panel_ref <- function(a, b, ...){
 #' @param ... ignored
 #'
 diag_label <- function(varname, .data,
-diag_label_simple = getOption('metaplot_diag_label_simple',FALSE),
-diag_label_split = getOption('metaplot_diag_label_split',TRUE),
-diag_symbol_format = getOption('metaplot_diag_symbol_format','wikisym2plotmath'),
+diag_label_simple = metOption('metaplot_diag_label_simple',FALSE),
+diag_label_split = metOption('metaplot_diag_label_split',TRUE),
+diag_symbol_format = metOption('metaplot_diag_symbol_format','wikisym2plotmath'),
 ...){
   stopifnot(length(varname) == 1)
   stopifnot(is.data.frame(.data))
@@ -420,7 +532,7 @@ metastats <- function(x, y, family = if(all(y %in% 0:1,na.rm = TRUE)) 'binomial'
 
 #' Coerce to Factor using Encoding if Present
 #'
-#' Coerces to factor, blending levels with encoding, if present. Vectors without encodings (or with empty encodings) acquire levels equal to \code{unique(x)} (notice that storage order controls presentation order). Vectors with non-empty encodings are decoded after harmonizing the encoding and the actual data. Factors with encodings defer to order and display value of the encoding as much as possible.  Missing levels are supplied.  Unused levels are removed.
+#' Coerces to factor, blending levels with encoding, if present. Vectors without encodings (or with empty encodings) acquire levels equal to \code{unique(x)} (notice that storage order controls presentation order). Vectors with non-empty encodings are decoded after harmonizing the encoding and the actual data. Factors with encodings defer to order and display value of the encoding as much as possible.  Missing levels are supplied.  Unused levels are removed. Other attributes beside 'class' and 'levels' are preserved.
 #'
 #' @export
 #' @param x vector or factor
@@ -442,6 +554,10 @@ metastats <- function(x, y, family = if(all(y %in% 0:1,na.rm = TRUE)) 'binomial'
 #'
 #'
 as_factor <- function(x){
+  at <- attributes(x)
+  at[['guide']] <- NULL
+  at[['class']] <- NULL
+  at[['levels']] <- NULL
   guide <- attr(x,'guide') # may be NULL (not encoded)
   vals <- if(is.factor(x)) levels(x) else unique(x)
   vals <- vals[!is.na(vals)]
@@ -457,6 +573,232 @@ as_factor <- function(x){
   encoding <- encode(codes, labels = decodes)
   x <- as.character(x)
   x <- decode(x, encoding = encoding)
-  x <- factor(x)
+  #x <- factor(x)
+  for(a in names(at))attr(x,a) <- at[[a]]
   x
 }
+
+lattice_padding <- function()list(
+  axis.components = list(
+    left = list(
+      pad2 = 1 # 2
+    ),
+    top = list(
+      pad1 = 0, # 1,
+      pad2 = 0  # 2
+    ),
+    right = list(
+      pad1 = 0, # 1,
+      pad2 = 0 # 2
+    ),
+    bottom = list(
+      pad1 = 0.5, # 1,
+      pad2 = 0  # 1
+    )
+  ),
+  layout.heights = list(
+    top.padding = .5, # 1,
+    main.key.padding = .5, # 1,
+    key.sub.padding = 0, # 1
+    bottom.padding = 0.5 # 1
+  ),
+  layout.widths = list(
+    left.padding = .5, # 1,
+    ylab.axis.padding = 0, # 1,
+    axis.key.padding = 0 #, # 1,
+  )
+)
+
+parintegrate <- function(par.settings, padding){
+  # res <- list()
+  # if(!is.null(par.settings)) res <- par.settings
+  stopifnot(length(padding) == 4)
+  merge.list(
+    par.settings,
+    list(
+      layout.heights = list(
+        top.padding <- padding[[1]],
+        bottom.padding <- padding[[3]]
+      ),
+      layout.widths = list(
+        right.padding <- padding[[2]],
+        left.padding <- padding[[4]]
+      )
+    )
+  )
+}
+
+# https://stackoverflow.com/questions/14255533/pretty-ticks-for-log-normal-scale-using-ggplot2-dynamic-not-manual
+base_breaks <- function(n = 10){
+  function(x) {
+    axisTicks(log(range(x, na.rm = TRUE)), log = TRUE, n = n)
+  }
+}
+#' Get Option with Partial Matching
+#'
+#' Gets an option value.  Selects the longest among all leading partial matches.
+#' (Ties are broken by sorting and taking the first.)
+#' This allows multiple options to be set simultaneously, and allows a subset of these to be overridden.
+#' The intended effect is similar to cascading style sheets.
+#'
+#' @param x a character string holding an option name
+#' @param default the value returned if option is not set
+#' @export
+#' @seealso \code{\link{getOption}}
+#' @examples
+#'
+#' library(magrittr)
+#' library(dplyr)
+#' library(csv)
+
+#' x <- as.csv(system.file(package = 'metaplot', 'extdata/theoph.csv'))
+#' x %<>% pack
+#'
+
+#' multiplot(
+#' x %>% metaplot(conc, gg = F),
+#' x %>% metaplot(conc, time, gg = F),
+#' x %>% metaplot(conc, arm, gg = F),
+#' x %>% metaplot(conc, arm,  gg = T)
+#' )
+#'
+#' # Add a reference line at 9 mg/L
+#' x$conc %<>% structure(reference = 9)
+#'
+#' # Make the reference line green universally.
+#' options(metaplot_ref_col = 'green')
+#'
+#' # Make the reference line orange for density plots
+#' options(metaplot_ref_col_dens = 'orange')
+#'
+#' multiplot(
+#' x %>% metaplot(conc, gg = F),
+#' x %>% metaplot(conc, time, gg = F),
+#' x %>% metaplot(conc, arm, gg = F),
+#' x %>% metaplot(conc, arm,  gg = T)
+#' )
+#'
+#' # Restore defaults
+#' options(metaplot_ref_col = NULL)
+#' options(metaplot_ref_col_dens = NULL)
+
+
+metOption <- function(x, default = NULL){
+  nms <- names(options())
+  nms <- nms[startsWith(x,nms)]
+  if(!length(nms)) return(default)
+  len <- nchar(nms)
+  max <- max(len)
+  nms <- nms[len == max]
+  nms <- sort(nms)
+  nm <- nms[[1]]
+  getOption(nm, default = default)
+}
+
+metaplot_aspect <- function(aspect, gg){
+  # metaplot default is 1
+  # lattice default is 'fill'
+  # ggplot default is NULL
+  # cross-translate:
+  empty <- FALSE
+  if(is.null(aspect)) empty <- TRUE
+  if(!is.null(aspect) && is.na(aspect)) empty <- TRUE
+  if(!is.null(aspect) && !is.na(aspect) && aspect == 'fill') empty <- TRUE
+  if(empty && !gg) aspect <- 'fill'
+  if(empty && gg) aspect <- NULL
+  aspect
+}
+
+#' Merge Two Lists
+#'
+#' Merges two lists. Every named element in the second argument is added recursively at the corresponding
+#' position in the first argument by name, over-writing existing values as necessary.
+#' Every un-named argument is added if there is no named argument to over-write.
+#'
+#' @param x a list (coerced if not)
+#' @param y a list (coerced if not)
+#' @param ... ignored
+#' @export
+#' @keywords internal
+#' @examples
+#' foo <- list(
+#'   a = list(         # substituted by name
+#'     col = 'red',    # substituted by name
+#'     lty = 'dashed', # substituted by name
+#'     alpha = 1,      # preserved
+#'     8,              # preserved, since element 4 in replacement matches by name
+#'     9               # substituted by position
+#'   ),
+#'   letters[8:10],    # preserved, siince elment 2 in replacement matches by name
+#'   b = 3
+#' )
+#'
+#' bar <- list(
+#'   letters[11:13],  # ignored: position conflict with named element
+#'   b = 2,           # substituted by name
+#'   a = list(        # substituted by name
+#'     'blue',        # ignored: position conflict with named element
+#'     col = 'green', # substituted by name
+#'     lty = 'solid', # substituted by name
+#'     lwd = 2,       # added by name
+#'     3,             # substituted by postion
+#'     4,             # added by postion
+#'     hue = 5        # added by name
+#'   ),
+#'   'baz'            # added by postion
+#' )
+#'
+#' foo
+#' bar
+#' merge(foo,bar)
+#' merge(list(1), list(2,foo = 3)) # 3 is assigned and named
+#' merge(list(1), list(foo = 2,3)) # 3 is ignored since position 2 has been named by time of evaluation
+#' merge(list(foo = 1), list(2,foo = 3)) # 2 ignored since pos. matches named argument; 3 overwrites
+#' merge(list(foo = 1), list(2,3)) # 2 is ignored since position matches a named argument; 3 added
+
+merge.list <- function(x, y, ...){
+  x <- as.list(x) # in case method is invoked directly
+  y <- as.list(y)
+  if(length(y) == 0) return(x)
+  index <- seq_along(y)
+  ynms <- names(y)
+  xnms <- names(x)
+  if(is.null(ynms)) ynms <- rep('', length.out = length(y))
+  if(is.null(xnms)) xnms <- rep('', length.out = length(x))
+  # now we have y and ynms with same non-zero length, indexed by index
+  #
+  for(i in index){
+    yn <- ynms[[i]] # could be ''
+    byName <- yn != ''
+    yi <- if(byName) y[[yn]] else y[[i]] # the candidate value, whether by name or position
+    xi <- NULL # the target test value
+    xn <- ''
+    if(!byName && length(x) >= i){
+      xn <- xnms[[i]]
+      xi <- x[[i]]
+    }
+    if(byName && yn %in% xnms){
+      xn <- yn
+      xi <- x[[yn]]
+    }
+    if(byName && !yn %in% xnms){
+      xnms <- c(xnms, yn) # will be true soon
+    }
+
+    # don't assign by position if doing so knocks out a named argument
+    if(yn == '' && xn != ''){next}
+    # otherwise, assign y[[i]] to x[[i]], recursively if necessary
+    loc <- if(byName) yn else i
+    if(is.list(xi) && is.list(yi)) {
+      x[[loc]] <- merge.list(xi, yi)
+    } else {
+      #message(xi, ' becomes ', yi)
+      x[[loc]] <- yi
+    }
+  }
+  x
+}
+
+
+
+

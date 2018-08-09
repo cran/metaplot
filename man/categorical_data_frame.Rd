@@ -5,25 +5,31 @@
 \title{Categorical Function for Data Frame}
 \usage{
 categorical_data_frame(x, yvar = NULL, xvar, groups = NULL, facets = NULL,
-  ylab = getOption("metaplot_lab", axislabel),
-  xlab = getOption("metaplot_lab", axislabel),
-  na.rm = getOption("metaplot_na.rm", TRUE),
-  aspect = getOption("metaplot_aspect", 1),
-  auto.key = getOption("metaplot_auto.key", NULL),
-  keycols = getOption("metaplot_keycols", NULL),
-  as.table = getOption("metaplot_categorical_as.table", TRUE),
-  prepanel = getOption("metaplot_categorical_prepanel", function(...)
+  ylab = metOption("metaplot_xlab_categorical", axislabel),
+  xlab = metOption("metaplot_ylab_categorical", axislabel),
+  na.rm = metOption("metaplot_narm_categorical", TRUE),
+  aspect = metOption("metaplot_aspect_categorical", 1),
+  space = metOption("metaplot_space_categorical", "right"),
+  key = metOption("metaplot_key_categorical", "metaplot_key"),
+  as.table = metOption("metaplot_astable_categorical", TRUE),
+  prepanel = metOption("metaplot_prepanel_categorical", function(...)
   list(xlim = 0:1, ylim = 0:1)),
-  scales = getOption("metaplot_categorical_scales", NULL),
-  panel = getOption("metaplot_categorical_panel", categorical_panel),
-  colors = getOption("metaplot_colors", NULL),
-  tiles = getOption("metaplot_tiles", 0.5),
-  lines = getOption("metaplot_lines", TRUE),
-  main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
-  NULL), tex = getOption("metaplot_tex", 0.9),
-  pch = getOption("metaplot_categorical_pch", 22),
-  rot = getOption("metaplot_categorical_rot", c(90, 0)), subscripts = TRUE,
-  par.settings = NULL, ...)
+  scales = metOption("metaplot_scales_categorical", NULL),
+  panel = metOption("metaplot_panel_categorical", categorical_panel),
+  colors = metOption("metaplot_colors_categorical", NULL),
+  fill = metOption("metaplot_fill_categorical", 0.5),
+  lines = metOption("metaplot_lines_categorical", TRUE),
+  main = metOption("metaplot_main_categorical", NULL),
+  sub = metOption("metaplot_sub_categorical", NULL),
+  tex = metOption("metaplot_tex_categorical", 0.9),
+  rot = metOption("metaplot_rot_categorical", c(90, 0)),
+  subscripts = metOption("metaplot_subscripts_categorical", TRUE),
+  settings = metOption("metaplot_settings_categorical", NULL),
+  padding = metOption("metaplot_padding_categorical", 1),
+  loc = metOption("metaplot_msg_loc_categorical", 5),
+  msg = metOption("metaplot_msg_format_categorical", "tilestats"),
+  cex = metOption("metaplot_cex_categorical", 1),
+  gg = metOption("metaplot_gg_categorical", FALSE), ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -42,23 +48,23 @@ categorical_data_frame(x, yvar = NULL, xvar, groups = NULL, facets = NULL,
 
 \item{na.rm}{whether to remove data points with one or more missing coordinates}
 
-\item{aspect}{passed to \code{\link[lattice]{xyplot}}}
+\item{aspect}{passed to \code{\link[lattice]{bwplot}} or ggplot; use 'fill', NA, or NULL to calculate automatically}
 
-\item{auto.key}{passed to \code{\link[lattice]{xyplot}}}
+\item{space}{location of key (right, left, top, bottom)}
 
-\item{keycols}{number of auto.key columns}
+\item{key}{list: passed to \code{\link[lattice]{xyplot}} as \code{auto.key} or to \code{\link[ggplot2]{theme}}; can be a function groups name, groups levels, fill, lines, space, gg, type ('categorical'), and \dots .  See \code{\link{metaplot_key}}.}
 
 \item{as.table}{passed to \code{\link[lattice]{xyplot}}}
 
 \item{prepanel}{passed to \code{\link[lattice]{xyplot}} (guessed if NULL)}
 
-\item{scales}{passed to \code{\link[lattice]{xyplot}} (guessed if NULL)}
+\item{scales}{passed to \code{\link[lattice]{xyplot}} or \code{\link[ggplot2]{facet_grid}} or \code{\link[ggplot2]{facet_wrap}} (guessed if NULL)}
 
-\item{panel}{name or definition of panel function}
+\item{panel}{name or definition of panel function for lattice}
 
 \item{colors}{replacements for default colors in group order}
 
-\item{tiles}{whether to fill rectangles for each group: logical, or alpha values between 0 and 1}
+\item{fill}{whether to fill rectangles for each group: logical, or alpha values between 0 and 1}
 
 \item{lines}{whether to plot borders for each group: logical, or alpha values between 0 and 1}
 
@@ -68,18 +74,26 @@ categorical_data_frame(x, yvar = NULL, xvar, groups = NULL, facets = NULL,
 
 \item{tex}{tile expansion: scale factor for reducing each tile size relative to full size (<= 1)}
 
-\item{pch}{symbol character for legend}
-
 \item{rot}{rotation for axis labels; can be length 2 for y and x axes, respectively}
 
 \item{subscripts}{passed to \code{\link[lattice]{xyplot}}}
 
-\item{par.settings}{passed to \code{\link[lattice]{xyplot}} (calculated if null)}
+\item{settings}{default parameter settings: a list from which matching elements are passed to lattice (as par.settings) or  to ggplot theme()  and facet_wrap() or facet_grid().  \code{ncol} and \code{nrow} are used as layout indices for lattice (for homology with facet_wrap).}
+
+\item{padding}{numeric (will be recycled to length 4) giving plot margins in default units: top, right, bottom, left (in multiples of 5.5 points for ggplot)}
+
+\item{loc}{where to print statistics in a tile}
+
+\item{msg}{a function of x and y to print text in a tile}
+
+\item{cex}{expansion for msg text}
+
+\item{gg}{logical: whether to generate \code{ggplot} instead of \code{trellis}}
 
 \item{...}{passed to \code{\link{region}}}
 }
 \description{
-Categorical function for class 'data.frame'. Default panel function implements a simple mosaic plot.
+Categorical function for class 'data.frame'. Implements a simple mosaic plot.
 }
 \examples{
 
@@ -89,12 +103,24 @@ library(csv)
 x <- as.csv(system.file(package = 'metaplot', 'extdata/theoph.csv'))
 x \%<>\% pack
 x \%>\% metaplot(site)
+x \%>\% metaplot(site, gg = T)
 x \%>\% metaplot(arm, site)
+x \%>\% metaplot(arm, site, gg = T)
 x \%>\% metaplot(arm, site, cohort)
+x \%>\% metaplot(arm, site, cohort, gg = T)
+x \%>\% metaplot(arm, site, cohort, space = 'top')
 x \%>\% metaplot(arm, site, , cohort)
+x \%>\% metaplot(arm, site, , cohort, gg = T)
+\donttest{
 x \%>\% metaplot(arm, site, , cohort, rot = c(0,90))
+x \%>\% metaplot(arm, site, , cohort, rot = c(0,90), gg = T)
 x \%>\% metaplot(arm, site, , cohort, rot = c(45, 45))
 x \%>\% metaplot(subject,cohort,arm, site, lines = F, rot = c(45,45))
+x \%>\% metaplot(subject,cohort,arm, site, lines = F, rot = c(45,45), gg=T)
+# panel-specific axis not well-supported for gg version
+x \%>\% metaplot(subject,cohort,,arm, site)
+x \%>\% metaplot(subject,cohort,,arm, site, gg=T)
+}
 }
 \seealso{
 \code{\link{categorical_panel}}
@@ -106,5 +132,7 @@ Other categorical: \code{\link{categorical.data.frame}},
 Other metaplot: \code{\link{boxplot_data_frame}},
   \code{\link{corsplom_data_frame}},
   \code{\link{densplot_data_frame}},
-  \code{\link{metaplot}}, \code{\link{scatter_data_frame}}
+  \code{\link{metaplot_key}}, \code{\link{metaplot}},
+  \code{\link{scatter_data_frame}},
+  \code{\link{test_metaplot}}
 }

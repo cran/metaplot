@@ -5,29 +5,64 @@
 \title{Scatterplot Function for Data Frame}
 \usage{
 scatter_data_frame(x, yvar, xvar, groups = NULL, facets = NULL,
-  log = getOption("metaplot_log", FALSE), ylog = getOption("metaplot_ylog",
-  log), xlog = getOption("metaplot_xlog", log),
-  crit = getOption("metaplot_crit", 1.3), yref = getOption("metaplot_ref",
-  metaplot_ref), xref = getOption("metaplot_ref", metaplot_ref),
-  ylab = getOption("metaplot_lab", axislabel),
-  xlab = getOption("metaplot_lab", axislabel),
-  ysmooth = getOption("metaplot_ysmooth", FALSE),
-  xsmooth = getOption("metaplot_xsmooth", FALSE),
-  iso = getOption("metaplot_iso", FALSE),
-  na.rm = getOption("metaplot_na.rm", TRUE),
-  aspect = getOption("metaplot_aspect", 1),
-  auto.key = getOption("metaplot_auto.key", NULL),
-  keycols = getOption("metaplot_keycols", NULL),
-  as.table = getOption("metaplot_scatter_as.table", TRUE),
-  prepanel = getOption("metaplot_scatter_prepanel", NULL),
-  scales = getOption("metaplot_scatter_scales", NULL),
-  panel = getOption("metaplot_scatter_panel", scatter_panel),
-  colors = getOption("metaplot_colors", NULL),
-  symbols = getOption("metaplot_symbols", NULL),
-  points = getOption("metaplot_points", TRUE),
-  lines = getOption("metaplot_lines", FALSE),
-  main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
-  NULL), subscripts = TRUE, par.settings = NULL, ...)
+  log = metOption("metaplot_log_scatter", FALSE),
+  ylog = metOption("metaplot_ylog_scatter", log),
+  xlog = metOption("metaplot_xlog_scatter", log),
+  crit = metOption("metaplot_crit_scatter", 1.3),
+  yref = metOption("metaplot_yref_scatter", metaplot_ref),
+  xref = metOption("metaplot_xref_scatter", metaplot_ref),
+  ylab = metOption("metaplot_ylab_scatter", axislabel),
+  xlab = metOption("metaplot_xlab_scatter", axislabel),
+  ysmooth = metOption("metaplot_ysmooth_scatter", FALSE),
+  xsmooth = metOption("metaplot_xsmooth_scatter", FALSE),
+  iso = metOption("metaplot_iso_scatter", FALSE),
+  na.rm = metOption("metaplot_narm_scatter", TRUE),
+  aspect = metOption("metaplot_aspect_scatter", 1),
+  space = metOption("metaplot_space_scatter", "right"),
+  key = metOption("metaplot_key_scatter", "metaplot_key"),
+  as.table = metOption("metaplot_astable_scatter", TRUE),
+  prepanel = metOption("metaplot_prepanel_scatter", NULL),
+  isoprepanel = metOption("metaplot_isoprepanel_scatter", iso_prepanel),
+  scales = metOption("metaplot_scales_scatter", NULL),
+  panel = metOption("metaplot_panel_scatter", scatter_panel),
+  colors = metOption("metaplot_colors_scatter", NULL),
+  fill = metOption("metaplot_fill_scatter", NULL),
+  symbols = metOption("metaplot_symbols_scatter", NULL),
+  types = metOption("metaplot_types_scatter", "solid"),
+  points = metOption("metaplot_points_scatter", TRUE),
+  lines = metOption("metaplot_lines_scatter", FALSE),
+  main = metOption("metaplot_main_scatter", NULL),
+  sub = metOption("metaplot_sub_scatter", NULL),
+  subscripts = metOption("metaplot_subscripts_scatter", TRUE),
+  settings = metOption("metaplot_settings_scatter", NULL),
+  padding = metOption("metaplot_padding_scatter", 1),
+  ref.col = metOption("metaplot_ref_col_scatter", "grey"),
+  ref.lty = metOption("metaplot_ref_lty_scatter", "solid"),
+  ref.lwd = metOption("metaplot_ref_lwd_scatter", 1),
+  ref.alpha = metOption("metaplot_ref_alpha_scatter", 1),
+  xref.col = metOption("metaplot_ref_col_x_scatter", ref.col),
+  xref.lty = metOption("metaplot_ref_lty_x_scatter", ref.lty),
+  xref.lwd = metOption("metaplot_ref_lwd_x_scatter", ref.lwd),
+  xref.alpha = metOption("metaplot_ref_x_alpha_scatter", ref.alpha),
+  yref.col = metOption("metaplot_ref_col_y_scatter", ref.col),
+  yref.lty = metOption("metaplot_ref_lty_y_scatter", ref.lty),
+  yref.lwd = metOption("metaplot_ref_lwd_y_scatter", ref.lwd),
+  yref.alpha = metOption("metaplot_ref_alpha_y_scatter", ref.alpha),
+  smooth.lty = metOption("metaplot_smooth_lty_scatter", "dashed"),
+  smooth.lwd = metOption("metaplot_smooth_lwd_scatter", 1),
+  smooth.alpha = metOption("metaplot_smooth_alpha_scatter", 1),
+  fit = metOption("metaplot_fit_plot_scatter", conf),
+  fit.lty = metOption("metaplot_fit_lty_scatter", "solid"),
+  fit.lwd = metOption("metaplot_fit_lwd_scatter", 1),
+  fit.alpha = metOption("metaplot_fit_alpha_scatter", 1),
+  conf = metOption("metaplot_conf_plot_scatter", FALSE),
+  conf.alpha = metOption("metaplot_conf_alpha_scatter", 0.3),
+  loc = metOption("metaplot_msg_loc_scatter", 0),
+  global = metOption("metaplot_global_aes_scatter", FALSE),
+  global.col = metOption("metaplot_global_col_scatter", "grey"),
+  global.fill = metOption("metaplot_global_fill_scatter", "grey"),
+  msg = metOption("metaplot_msg_format_scatter", "metastats"),
+  gg = metOption("metaplot_gg_scatter", FALSE), ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -48,9 +83,9 @@ scatter_data_frame(x, yvar, xvar, groups = NULL, facets = NULL,
 
 \item{crit}{if ylog or xlog missing, log transform if mean/median ratio for non-missing values is greater than crit}
 
-\item{yref}{reference line from y axis; can be function(x = x, var = yvar, ...)}
+\item{yref}{reference line from y axis; can be function(x = x, var = yvar, ...) or NULL to suppress}
 
-\item{xref}{reference line from x axis; can be function(x = x, var = xvar, ...)}
+\item{xref}{reference line from x axis; can be function(x = x, var = xvar, ...) or NULL to suppress}
 
 \item{ylab}{y axis label; can be function(x = x, var = yvar, log = ylog, ..)}
 
@@ -60,29 +95,37 @@ scatter_data_frame(x, yvar, xvar, groups = NULL, facets = NULL,
 
 \item{xsmooth}{supply loess smmoth of x on y}
 
-\item{iso}{plot line of unity (auto-selected if NA)}
+\item{iso}{logical: plot line of unity (auto-selected if NA); can be a (partial) list of aesthetics (col, lty, lwd, alpha)}
 
 \item{na.rm}{whether to remove data points with one or more missing coordinates}
 
-\item{aspect}{passed to \code{\link[lattice]{xyplot}}}
+\item{aspect}{passed to \code{\link[lattice]{bwplot}} or ggplot; use 'fill', NA, or NULL to calculate automatically}
 
-\item{auto.key}{passed to \code{\link[lattice]{xyplot}}}
+\item{space}{location of key (right, left, top, bottom)}
 
-\item{keycols}{number of auto.key columns}
+\item{key}{list: passed to \code{\link[lattice]{xyplot}} as \code{auto.key} or to \code{\link[ggplot2]{theme}}; can be a function groups name, groups levels, points, lines, space, gg, and \dots .  See \code{\link{metaplot_key}}.}
 
 \item{as.table}{passed to \code{\link[lattice]{xyplot}}}
 
 \item{prepanel}{passed to \code{\link[lattice]{xyplot}} (guessed if NULL)}
 
-\item{scales}{passed to \code{\link[lattice]{xyplot}} (guessed if NULL)}
+\item{isoprepanel}{passed to \code{\link[lattice]{xyplot}} if iso is TRUE}
+
+\item{scales}{passed to \code{\link[lattice]{xyplot}} or \code{\link[ggplot2]{facet_grid}} or \code{\link[ggplot2]{facet_wrap}} (guessed if NULL)}
 
 \item{panel}{name or definition of panel function}
 
 \item{colors}{replacements for default colors in group order}
 
-\item{symbols}{replacements for default symbols in group order}
+\item{fill}{replacements for default fill colors in group order (means something different
+for \code{\link{densplot_data_frame}} and \code{\link{categorical_data_frame}}). Used for confidence
+regions and for filling symbols (pch 21:25).}
 
-\item{points}{whether to plot points for each group: logical, or alpha values between 0 and 1}
+\item{symbols}{replacements for default symbols in group order (i.e. values of pch)}
+
+\item{types}{replacements for default linetypes in group order}
+
+\item{points}{whether to plot points and fill for each group: logical, or alpha values between 0 and 1}
 
 \item{lines}{whether to plot lines for each group: logical, or alpha values between 0 and 1}
 
@@ -92,7 +135,63 @@ scatter_data_frame(x, yvar, xvar, groups = NULL, facets = NULL,
 
 \item{subscripts}{passed to \code{\link[lattice]{xyplot}}}
 
-\item{par.settings}{passed to \code{\link[lattice]{xyplot}} (calculated if NULL)}
+\item{settings}{default parameter settings: a list from which matching elements are passed to lattice (as par.settings) or  to ggplot theme()  and facet_wrap() or facet_grid().  \code{ncol} and \code{nrow} are used as layout indices for lattice (for homology with facet_wrap).}
+
+\item{padding}{numeric (will be recycled to length 4) giving plot margins in default units: top, right, bottom, left (in multiples of 5.5 points for ggplot)}
+
+\item{ref.col}{default shared by \code{xref.col} and \code{yref.col}}
+
+\item{ref.lty}{default shared by \code{xref.lty} and \code{yref.lty}}
+
+\item{ref.lwd}{default shared by \code{xref.lwd} and \code{yref.lwd}}
+
+\item{ref.alpha}{default shared by \code{xref.alpha} and \code{yref.alpha}}
+
+\item{xref.col}{x reference line color (recycled)}
+
+\item{xref.lty}{x reference line type (recycled)}
+
+\item{xref.lwd}{x reference line size (recycled)}
+
+\item{xref.alpha}{x reference line alpha (recycled)}
+
+\item{yref.col}{y reference line color (recycled)}
+
+\item{yref.lty}{y reference line type (recycled)}
+
+\item{yref.lwd}{y reference line size (recycled)}
+
+\item{yref.alpha}{y reference line alpha (recycled)}
+
+\item{smooth.lty}{smooth line type}
+
+\item{smooth.lwd}{smooth line size}
+
+\item{smooth.alpha}{smooth alpha}
+
+\item{fit}{draw a linear fit of y ~ x}
+
+\item{fit.lty}{fit line type}
+
+\item{fit.lwd}{fit line size}
+
+\item{fit.alpha}{fit alpha}
+
+\item{conf}{logical, or width for a confidence region around a linear fit; passed to \code{\link{region}}; \code{TRUE} defaults to 95 percent confidence interval; may not make sense if xlog is TRUE}
+
+\item{conf.alpha}{alpha transparency for confidence region}
+
+\item{loc}{where to print statistics on a panel; suppressed for grouped plots an facetted ggplots}
+
+\item{global}{if TRUE, xsmooth, ysmooth, fit, and conf are applied to all data rather than groupwise}
+
+\item{global.col}{color for global aesthetics}
+
+\item{global.fill}{fill color for global aesthetics}
+
+\item{msg}{a function to print text on a panel: called with x values, y values, and \dots.}
+
+\item{gg}{logical: whether to generate \code{ggplot} instead of \code{trellis}}
 
 \item{...}{passed to \code{\link{region}}}
 }
@@ -111,6 +210,7 @@ scatter_data_frame(Theoph, 'conc', 'Time')
 scatter_data_frame(Theoph, 'conc','Time', 'Subject')
 scatter_data_frame(Theoph, 'conc','Time', facets = 'Subject')
 scatter_data_frame(Theoph \%>\% filter(conc > 0), 'conc','Time', 'Subject',ylog = TRUE, yref = 5)
+scatter_data_frame(Theoph, 'conc','Time', 'Subject',ylog = TRUE, yref = 5)
 scatter_data_frame(Theoph, 'conc','Time', 'Subject',ysmooth = TRUE)
 scatter_data_frame(Theoph, 'conc','Time', 'Subject',ysmooth = TRUE,global = TRUE)
 scatter_data_frame(Theoph, 'conc','Time', conf = TRUE, loc = 3, yref = 6)
@@ -126,8 +226,11 @@ Other bivariate plots: \code{\link{iso_prepanel}},
 Other metaplot: \code{\link{boxplot_data_frame}},
   \code{\link{categorical_data_frame}},
   \code{\link{corsplom_data_frame}},
-  \code{\link{densplot_data_frame}}, \code{\link{metaplot}}
+  \code{\link{densplot_data_frame}},
+  \code{\link{metaplot_key}}, \code{\link{metaplot}},
+  \code{\link{test_metaplot}}
 
-Other scatter: \code{\link{scatter.data.frame}},
+Other scatter: \code{\link{metaplot_key}},
+  \code{\link{scatter.data.frame}},
   \code{\link{scatter_panel}}, \code{\link{scatter}}
 }

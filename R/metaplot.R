@@ -4,6 +4,7 @@ globalVariables('VARIABLE')
 globalVariables('VALUE')
 globalVariables('collapse')
 globalVariables('panel_')
+globalVariables('axisTicks')
 
 #' Metaplot
 #'
@@ -83,6 +84,10 @@ globalVariables('panel_')
 #' x <- as.csv(system.file(package = 'metaplot', 'extdata/theoph.csv'))
 #' x %<>% pack
 
+#' # options(metaplot_gg = TRUE)
+#' # options(metaplot_verbose = TRUE)  # all messages; equiv. to metaplot(verbose = T,...)
+#' # options(metaplot_verbose_ = TRUE) # plot function messages
+#' # options(metaplot_verbose_densplot = TRUE) # densplot messages
 
 #' # sample plots
 #' x %>% metaplot(sres)
@@ -93,27 +98,37 @@ globalVariables('panel_')
 #' x %>% metaplot(conc, arm, site)
 #' x %>% metaplot(conc, site, arm)
 #' x %>% metaplot(conc, time)
-#' # x %>% metaplot(conc, time, panel = panel.smoothScatter)
 #' x %>% metaplot(arm, site)
 #' x %>% metaplot(arm, site, cohort)
+#' x %>% metaplot(arm, site, cohort, space = 'top')
 #' x %>% metaplot(arm, site, , cohort)
 #' x %>% metaplot(conc, time, subject)
 #' x %>% metaplot(conc, time, , subject)
+
 #' x %>% metaplot(conc, time, subject, site)
 #' x %>% metaplot(conc, time, subject, site, arm)
 #' x %>% metaplot(lKe, lKa, lCl)
+#'
+#' \donttest{
+
 #' x %>% metaplot(
 #'   lKe, lKa, lCl,
-#'   col = 'black',loess.col = 'red', pin.col = 'red',
+#'   col = 'black',smooth.col = 'red', pin.col = 'red',
 #'   dens.col='blue',dens.alpha = 0.1
 #' )
-#' x %>% metaplot(conc, pred, ipred, time)
-#' x %>% metaplot(conc, pred, ipred, time, subject)
+
+#' x %>% metaplot(conc, pred, ipred, time, space = 'top')
+#' x %>% metaplot(conc, pred, ipred, time, subject, space = 'top')
+
 #' x %>% metaplot(conc, pred, ipred, time, subject,
-#' colors = c('black','blue','magenta'),
-#' points = c(0.9,0, 0.4),
-#' lines = c(F,T,T))
-#' x %>% metaplot(conc, ipred, time, site, arm)
+#'   colors = c('black','blue','orange'),
+#'   points = c(0.9,0, 0.4),
+#'   lines = c(F,T,T),
+#'   types = c('blank','dashed','solid'),
+#'   space = 'top'
+#' )
+#'
+#' x %>% metaplot(conc, ipred, time, site, arm, space = 'top')
 #' x %>% metaplot(res, conc, yref = 0, ysmooth = T, conf = T, grid = T, loc = 1)
 #' x %>% metaplot(res, conc, arm, ysmooth = T, conf = T )
 #' x %>% metaplot(res, conc, arm, ysmooth = T, conf = T, global = T, ref.col = 'red')
@@ -121,17 +136,19 @@ globalVariables('panel_')
 #'
 #' # manage metadata
 #' attr(x$arm, 'guide') # //1/Arm A//2/Arm B//
+#'
 #' x %>% metaplot(conc, arm) # default
 #'
 #' x %>% mutate(arm = arm %>%
-#' structure(guide = '//2/Arm B//1/Arm A//')) %>%
-#' metaplot(conc, arm) # different presentation order
+#'   structure(guide = '//2/Arm B//1/Arm A//')) %>%
+#'   metaplot(conc, arm) # different presentation order
 #'
 #' x %>% mutate(arm = arm %>%
-#' structure(guide = '//1/Both Arms//2/Both Arms//')) %>%
-#' metaplot(conc, arm) # collapse cases
+#'   structure(guide = '//1/Both Arms//2/Both Arms//')) %>%
+#'   metaplot(conc, arm) # collapse cases
 #'
 #'
+#'}
 metaplot <- function(x,...)UseMethod('metaplot')
 
 
@@ -145,6 +162,7 @@ metaplot <- function(x,...)UseMethod('metaplot')
 #' @param bivariate function for arguments that resolve to two numerics (see rules)
 #' @param multivariate function for more than two numeric arguments
 #' @param categorical function for categorical arguments
+#' @param verbose generate messages describing process; passed to called functions if explicitly supplied
 #' @param ... passed arguments
 #' @import encode
 #' @family methods
@@ -246,12 +264,12 @@ metaplot <- function(x,...)UseMethod('metaplot')
 #' y$site <- as.factor(y$site)
 #' y$subject <- as.factor(y$subject)
 #' y %>% metaplot(conc)
-#'#y %>% metaplot(site)
+#' y %>% metaplot(site)
 #' y %>% metaplot(wt, arm)
 #' y %>% metaplot(arm, wt)
 #' y %>% metaplot(arm, wt,site)
 #' y %>% metaplot(conc, time)
-#'#y %>% metaplot(arm, site)
+#' y %>% metaplot(arm, site)
 #' y %>% metaplot(conc, time, subject)
 #' y %>% metaplot(conc, time, , subject)
 #' y %>% metaplot(conc, time, subject, site)
@@ -272,15 +290,18 @@ metaplot.data.frame <- function(
   mixedvariate = getOption('metaplot_mixedvariate','boxplot'),
   bivariate    = getOption('metaplot_bivariate','scatter'),
   multivariate = getOption('metaplot_multivariate','corsplom'),
-  categorical  = getOption('metaplot_categorical','categorical')
+  categorical  = getOption('metaplot_categorical','categorical'),
+  verbose      = getOption('metaplot_verbose',FALSE)
 ){
   args <- quos(...)
   args <- lapply(args,f_rhs)
   vars <- args[names(args) == '']
   other <- args[names(args) != '']
   vars <- sapply(vars, as.character)
+  anon <- vars
+  if(verbose) message('found these anonymous arguments: ', paste(anon, collapse = ', '))
   # now x, vars, and other are passable
-  args <- c(list(x = x),vars,other)
+  args <- c(list(x = x),vars,other,if(missing(verbose)) NULL else list(verbose = verbose))
   # where to pass them depends only on properties of prime variables
   # prime is all y, if present, and x
   # prime is defined as all vars before groups or facets, if present
@@ -293,6 +314,7 @@ metaplot.data.frame <- function(
   # test numeric
   stopifnot(all(vars %in% names(x)))
   num <- sapply(x[vars], is.numeric)
+  was <- num # store for messaging
 
   # but the definition of numeric depends partly on guide.
   guide <- lapply(x[vars], attr, 'guide')
@@ -307,33 +329,562 @@ metaplot.data.frame <- function(
   pos <- seq_along(num)
   can <- !num & pos > 2
   grp <- match(TRUE, can)
+  grpvar <- NA
+  if(is.defined(grp)) grpvar <- names(num)[grp]
   if(is.defined(grp)) num <- num[seq(length.out = grp - 1)]
 
   # now all num corresponds to prime vars (y if any, x)
   # the last of these is x
-
+  prime <- names(num)
+  facets <- setdiff(anon, c('',grpvar, prime))
+  xvar <- rev(prime)[[1]]
+  yvar <- setdiff(prime, xvar)
+  main <- vars
+  nativnum <- names(was)[was]
+  nativcat <- setdiff(vars, nativnum)
+  virtucat <- setdiff(vars, prime[num])
+    if(verbose){
+    message('detected these main variables: ',paste(main,collapse = ', '))
+    message('these are natively numeric: ', paste(collapse = ', ', nativnum))
+    if(length(nativcat))message('these are natively categorical: ', paste(collapse = ', ', nativcat))
+    if(length(virtucat))message('these are categorical by virtue of guide attribute: ', paste(collapse = ', ', virtucat))
+    if(length(yvar))message('y variable(s): ',paste(collapse = ', ',yvar))
+    message('x variable: ', xvar)
+    if(is.defined(missing)) message('grouping variable: explicitly missing')
+    if(is.defined(grp)) message('grouping variable: ',grpvar)
+    if(length(facets)) message('facet(s): ',paste(collapse = ', ', facets))
+  }
   stopifnot(length(num) > 0)
-  if(length(num) == 1 & !num[[1]])return(do.call(match.fun(categorical), args))
-  if(length(num) == 1 & num[[1]]) return(do.call(match.fun(univariate), args))
+  if(length(num) == 1 & !num[[1]]){
+    if(verbose){
+      message('only one main variable, and it is categorical')
+      if(is.character(categorical))message('calling ', categorical) else message('calling categorical')
+    }
+    return(do.call(match.fun(categorical), args))
+  }
+  if(length(num) == 1 & num[[1]]) {
+    if(verbose){
+      message('only one main variable and it is numeric')
+      if(is.character(univariate))message('calling ', univariate) else message('calling univariate')
+    }
+    return(do.call(match.fun(univariate), args))
+  }
   # now length num is at least 2
-  if(xor(num[[1]],num[[2]])) return(do.call(match.fun(mixedvariate),args))
-  if(!num[[1]] && !num[[2]]) return(do.call(match.fun(categorical),args))
+  if(xor(num[[1]],num[[2]])){
+    if(verbose){
+      message('two main variables and only one is numeric')
+      if(is.character(mixedvariate))message('calling ', mixedvariate) else message('calling mixedvariate')
+      if(is.defined(grpvar))message(grpvar, ' is effectively a facet')
+      if(is.character(univariate))message('consider also grouped ', univariate) else message('consider also grouped univariate')
+    }
+    return(do.call(match.fun(mixedvariate),args))
+  }
+  if(!num[[1]] && !num[[2]]) {
+    if(verbose){
+      message('two main variables and both are categorical')
+      if(is.character(categorical))message('calling ', categorical) else message('calling categorical')
+    }
+    return(do.call(match.fun(categorical),args))
+  }
   # now there are no categoricals in the first two positions
   # that means there are two numerics in first two positions
   # that means there is at least one y and at least one x
   # find x.
   xpos <- length(num)
   ypos <- 1:(xpos - 1)
+  # if(verbose) message('y variable(s): ', paste(collapse = ', ', names(num)[ypos]))
+  # if(verbose) message('x variable: ',rev(names(num))[[1]])
   yguide <- guide[ypos]
   xguide <- guide[xpos]
   # we only need to choose between multivariate and bivariate.
   # if all yguide identical and distinct from xguide, we collapse to bivariate overlay.
   overlay <- FALSE
-  if(length(unique(yguide)) == 1 &  paste(yguide[[1]]) != paste(xguide) ) overlay <- TRUE
-  if(length(ypos) > 1 & !overlay) return(do.call(match.fun(multivariate),args))
+  if(length(unique(yguide)) == 1 &  paste(yguide[[1]]) != paste(xguide) ) {
+    if(verbose && length(ypos) > 1) {
+      message('guides for y variables are identical (',unique(yguide),') and different from x guide (', xguide,')')
+      message('this will be an overlay (bivariate) plot rather than multivariate')
+    }
+    overlay <- TRUE
+  }
+  if(length(ypos) > 1 & !overlay) {
+    if(verbose){
+      message('there are multiple y variables; guides (if any) not different from x guide')
+      message('this will be a multivariate plot rather than bivariate')
+      if(is.character(multivariate))message('calling ', multivariate) else message('calling multivariate')
+    }
+    return(do.call(match.fun(multivariate),args))
+  }
   # now univariate, mixedvariate, and multivariate plots have been dismissed.
   # only bivariate remains
+  if(verbose){
+    if(is.character(bivariate))message('calling ', bivariate) else message('calling bivariate')
+    # if(length(ypos) > 1) message('there are multiple y variables')
+  }
   return(do.call(match.fun(bivariate),args))
 }
 
+#' Test Metaplot Variants
+#'
+#' Tests metaplot variants by example.  Returns null. Use \code{example(test_metaplot)}.
+#'
+#' @export
+#' @family generic functions
+#' @family metaplot
+#' @return NULL
+#' @examples
+#'
+#' library(magrittr)
+#' library(dplyr)
+#' library(csv)
+
+#' x <- as.csv(system.file(package = 'metaplot', 'extdata/theoph.csv'))
+#' x %<>% pack
+#' \donttest{
+#' multiplot(
+#' x %>% metaplot(sres, gg = F),
+#' x %>% metaplot(sres, gg = T, padding = 3.5)
+#' )
+#' multiplot(
+#' x %>% metaplot(site, gg = F),
+#' x %>% metaplot(site, gg = T, padding = 3.5)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, arm, gg = F),
+#' x %>% metaplot(conc, arm, gg = T, padding = 4)
+#' )
+#' multiplot(
+#' x %>% densplot(conc, arm, gg = F),
+#' x %>% densplot(conc, arm, gg = T, padding = 8)
+#' )
+#' multiplot(
+#' x %>% densplot(
+#'   conc, arm, gg = F, space = 'top',
+#'   columns = 2,
+#'   legend.direction = 'horizontal' # ignored
+#' ),
+#' x %>% densplot(conc, arm, gg = T, space = 'top',
+#'   columns = 2, # ignored
+#'   legend.direction = 'horizontal' , padding = 3
+#' ))
+#' multiplot(
+#' x %>% metaplot(arm, conc, gg = F),
+#' x %>% metaplot(arm, conc, gg = T, padding = 3.5)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, arm, site, gg = F),
+#' x %>% metaplot(conc, arm, site, gg = T, padding = 5)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, site, arm, gg = F),
+#' x %>% metaplot(conc, site, arm, gg = T, padding = 5)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, time, gg = F),
+#' x %>% metaplot(conc, time, gg = T, padding = 5)
+#' )
+#' multiplot(
+#' x %>% metaplot(arm, site, gg = F),
+#' x %>% metaplot(arm, site, gg = T, padding = 3)
+#' )
+#' multiplot(
+#' x %>% metaplot(arm, site, cohort, gg = F),
+#' x %>% metaplot(arm, site, cohort, gg = T, padding = 5)
+#' )
+#' multiplot(
+#' x %>% metaplot(arm, site, cohort, gg = F, space = 'top',
+#'   columns = 2, padding = c(5,1,1,1)),
+#' x %>% metaplot(arm, site, cohort, gg = T, space = 'top',
+#'   legend.direction = 'horizontal', padding = 2)
+#' )
+#' multiplot(
+#' x %>% metaplot(arm, site, , cohort, gg = F),
+#' x %>% metaplot(arm, site, , cohort, gg = T, padding = 4)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, time, subject, gg = F),
+#' x %>% metaplot(conc, time, subject, gg = T, padding = 3)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, time, , subject, gg = F),
+#' x %>% metaplot(conc, time, , subject, gg = T, padding = 5)
+#' )
+#' multiplot( ncol = 2,
+#' x %>% metaplot(conc, time, subject, site, gg = F),
+#' x %>% metaplot(conc, time, subject, site, gg = T, padding = 4)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, time, subject, site, arm, gg = F, padding = 2),
+#' x %>% metaplot(conc, time, subject, site, arm, gg = T)
+#' )
+#' multiplot(
+#' x %>% metaplot(lKe, lKa, lCl, gg = F),
+#' x %>% metaplot(lKe, lKa, lCl, gg = T, padding = 2)
+#' )
+#' multiplot(
+#' x %>% metaplot(
+#'   lKe, lKa, lCl,
+#'   col = 'black',smooth.col = 'red', pin.col = 'red',
+#'   dens.col = 'blue', dens.alpha = 0.1, gg = F
+#' ),
+#' x %>% metaplot(
+#'   lKe, lKa, lCl,
+#'   col = 'black',smooth.col = 'red', pin.col = 'red',
+#'   dens.col='blue',dens.alpha = 0.1, gg = T, padding = 2)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, pred, ipred, time, space = 'top', gg = F),
+#' x %>% metaplot(conc, pred, ipred, time, space = 'top', gg = T, padding = 3)
+#' )
+#' multiplot(
+#' x %>% metaplot(conc, pred, ipred, time, subject, space = 'top', gg = F),
+#' x %>% metaplot(conc, pred, ipred, time, subject, space = 'top', gg = T, padding = 5)
+#' )
+#' multiplot(
+#' x %>% metaplot(
+#'   conc, pred, ipred, time, subject,
+#'   colors = c('black','blue','orange'),
+#'   points = c(0.9,0, 0.4),
+#'   lines = c(F,T,T),
+#'   space = 'top', gg = F
+#' ),
+#' x %>% metaplot(
+#'   conc, pred, ipred, time, subject,
+#'   colors = c('black','blue','orange'),
+#'   points = c(0.9,0, 0.4),
+#'   lines = c(F,T,T),
+#'   space = 'top', gg = T, padding = 4
+#' ))
+#' multiplot(
+#' x %>% metaplot(conc, ipred, time, site, arm, space = 'top', gg = F),
+#' x %>% metaplot(conc, ipred, time, site, arm, space = 'top', gg = T)
+#' )
+#' multiplot(
+#' x %>% metaplot(res, conc, yref = 0, ysmooth = T, conf = T, grid = T, loc = 1, gg = F),
+#' x %>% metaplot(res, conc, yref = 0, ysmooth = T, conf = T, grid = T, loc = 1, gg = T, padding = 3.5)
+#' )
+#' multiplot(
+#' x %>% metaplot(res, conc, arm, ysmooth = T, conf = T , gg = F),
+#' x %>% metaplot(res, conc, arm, ysmooth = T, conf = T , gg = T, padding = 3.5)
+#' )
+
+#' # Fill color can differ from point color but is the same for points and regions.
+#' # 'points' controls alpha of point and point fill independently of conf.fill.
+
+#' multiplot(
+#' x %>% metaplot(res, conc, arm, conf = T , gg = F, yref = NULL, points = 0.3,
+#'   symbols = 21:22, colors = c('blue','black'), fill = c('green','red')
+#' ),
+#' x %>% metaplot(res, conc, arm, conf = T , gg = T, yref = NULL, points = 0.3, padding = 3.5,
+#'   symbols = 21:22, colors = c('blue','black'), fill = c('green','red')
+#' ))
+
+#' multiplot(
+#' x %>% metaplot(res, conc, arm, ysmooth = T, conf = T, global = T,
+#'   ref.col = 'red', gg = F),
+#' x %>% metaplot(res, conc, arm, ysmooth = T, conf = T, global = T,
+#'   ref.col = 'red', gg = T, padding = 3.5)
+#' )
+#' multiplot(
+#' x %>% metaplot(subject,conc, gg = F),
+#' x %>% metaplot(subject,conc, gg = T, padding = 3.5)
+#' )
+#'
+#' # manage metadata
+#' attr(x$arm, 'guide') # //1/Arm A//2/Arm B//
+#' multiplot(
+#' x %>% metaplot(conc, arm, gg = F),
+#' x %>% metaplot(conc, arm, gg = T, padding = 4)
+#' ) # default
+#'
+#' multiplot(
+#' x %>% mutate(arm = arm %>%
+#'   structure(guide = '//2/Arm B//1/Arm A//')) %>%
+#'   metaplot(conc, arm, gg = F),
+#' x %>% mutate(arm = arm %>%
+#'   structure(guide = '//2/Arm B//1/Arm A//')) %>%
+#'   metaplot(conc, arm, gg = T, padding = 4) # different presentation order
+#' )
+#'
+#' multiplot(
+#' x %>% mutate(arm = arm %>%
+#'   structure(guide = '//1/Both Arms//2/Both Arms//')) %>%
+#'   metaplot(conc, arm, gg = F),
+#' x %>% mutate(arm = arm %>%
+#'   structure(guide = '//1/Both Arms//2/Both Arms//')) %>%
+#'   metaplot(conc, arm, gg = T, padding = 4) # collapse cases
+#' )
+#'
+#'x %>% densplot(
+#'  main = 'Density Plot',
+#'  sub = 'using lattice',
+#'  gg = F,
+#'  sres, subject,
+#'  ref.col = 'red', ref.alpha = 0.5,
+#'  ref.lty = 'dashed', ref.lwd = 2,
+#'  log = F,
+#'  aspect = NULL,
+#'  colors = c('red','blue','darkgreen'),
+#'  symbols = c(21, 22, 23),
+#'  points = 0.3,
+#'  lines = .5,
+#'  fill = 0.1,
+#'  space = 'left',
+#'  padding = c(1,2,3,4),
+#'  other = 'none'
+#')
+#'x %>% densplot(
+#'  main = 'Density Plot',
+#'  sub = 'using ggplot',
+#'  gg = T,
+#'  sres, subject,
+#'  ref.col = 'red', ref.alpha = 0.5,
+#'  ref.lty = 'dashed', ref.lwd = 2,
+#'  log = F,
+#'  aspect = NULL,
+#'  colors = c('red','blue','darkgreen'),
+#'  symbols = c(21, 22, 23),
+#'  points = 0.3,
+#'  lines = 0.5,
+#'  fill = 0.1,
+#'  space = 'left',
+#'  padding = 1:4,
+#'  other = 'none'
+#')
+#'x %>% filter(conc > 0) %>% metaplot(
+#'  main = 'Box Plot',
+#'  sub = 'using lattice',
+#'  gg = F,
+#'  arm, conc,
+#'  log = T,
+#'  ref = 4, ref.col = 'red',
+#'  ref.lty = 'dashed', ref.lwd = 2,
+#'  nobs = T,
+#'  padding = 1:4,
+#'  reverse = FALSE,
+#'  pch = 20,
+#'  notch = TRUE,
+#'  aspect = NA,
+#'  other = 'none'
+#')
+#'
+#'x %>% filter(conc > 0) %>% metaplot(
+#'  main = 'Box Plot',
+#'  sub = 'using ggplot',
+#'  gg = T,
+#'  arm, conc,
+#'  log = T,
+#'  ref = 4, ref.col = 'red',
+#'  ref.lty = 'dashed', ref.lwd = 2,
+#'  nobs = T,
+#'  padding = 1:4,
+#'  reverse = FALSE,
+#'  pch = 20,
+#'  notch = TRUE,
+#'  aspect = NA,
+#'  other = 'none'
+#')
+#'x %>% metaplot(
+#'  main = 'Categorical Plot',
+#'  sub = 'using lattice',
+#'  gg = F,
+#'  arm, site, cohort,
+#'  aspect = 'fill', space = 'top',
+#'  as.table = FALSE,
+#'  colors = c('red','blue','green'),
+#'  fill = c(0.3, 0.5, 0.7),
+#'  lines = c(0.7, 0.5, 0.3),
+#'  tex = 0.8, rot = 45,
+#'  padding = 1:4, loc = 1,
+#'  cex = .5,
+#'  other = 'none'
+#')
+#'
+#'x %>% metaplot(
+#'  main = 'Categorical Plot',
+#'  sub = 'using ggplot2',
+#'  gg = T,
+#'  arm, site, cohort,
+#'  aspect = 'fill', space = 'top',
+#'  as.table = FALSE,
+#'  colors = c('red','blue','green'),
+#'  fill = c(0.3, 0.5, 0.7),
+#'  lines = c(0.7, 0.5, 0.3),
+#'  tex = 0.8, rot = 45,
+#'  padding = 1:4, loc = 1,
+#'  cex = .5,
+#'  other = 'none'
+#')
+#' x %>% metaplot(
+#'   main = 'Correlation Splom',
+#'   sub = 'using lattice',
+#'   gg = F,
+#'   lKe, lKa, lCl,
+#'   varname.cex = 2,
+#'   col = 'purple',
+#'   smooth.col = 'orange', smooth.alpha = 0.9,
+#'   smooth.lty = 'dashed', smooth.lwd = 2,
+#'   pin.col = 'orange', pin.alpha = 0.9,
+#'   dens.col = 'purple',dens.alpha = 0.2, dens.scale = 0.1,
+#'   padding = 1:4,
+#'   other = 'none',
+#'   xlab = 'parameters'
+#' )
+#' x %>% metaplot(
+#'   main = 'Correlation Splom',
+#'   sub = 'using ggplot',
+#'   gg = T,
+#'   lKe, lKa, lCl,
+#'   varname.cex = 2,
+#'   col = 'purple',
+#'   smooth.col = 'orange', smooth.alpha = 0.9,
+#'   smooth.lty = 'dashed', smooth.lwd = 2,
+#'   pin.col = 'orange', pin.alpha = 0.9,
+#'   dens.col = 'purple',dens.alpha = 0.2, dens.scale = 0.1,
+#'   padding = 1:4,
+#'   other = 'none',
+#'   xlab = 'parameters'
+#' )
+#' x %>% metaplot(
+#'   main = 'Scatterplot',
+#'   sub = 'using lattice',
+#'   gg = F,
+#'   res, conc,
+#'   yref = 0, ysmooth = T,
+#'   smooth.lty = 'dotted', smooth.lwd = 2,
+#'   smooth.alpha = 1,
+#'   aspect = 0.8,
+#'   space = 'bottom',
+#'   colors = c('purple','darkgreen','peach'),
+#'   symbols = 21:23,
+#'   points = c(0.3, 0.5, 0.7),
+#'   lines = F,
+#'   padding = 1:4,
+#'   ref.col = 'blue',
+#'   ref.lty = 'dashed', ref.lwd = 2,
+#'   ref.alpha = 0.5,
+#'   conf = .99999,
+#'   fit.lty = 'dashed', fit.lwd = 2,
+#'   fit.alpha = 0.5,
+#'   conf.alpha = 0.2,
+#'   global = T,
+#'   global.col = 'darkgreen',
+#'   grid = T, loc = 1,
+#'   other = 'none'
+#'  )
+#' x %>% metaplot(
+#'   main = 'Scatterplot',
+#'   sub = 'using ggplot',
+#'   gg = T,
+#'   res, conc,
+#'   yref = 0, ysmooth = T,
+#'   smooth.lty = 'dotted', smooth.lwd = 2,
+#'   smooth.alpha = 1,
+#'   aspect = 0.8,
+#'   space = 'bottom',
+#'   colors = c('purple','darkgreen','peach'),
+#'   symbols = 21:23,
+#'   points = c(0.3, 0.5, 0.7),
+#'   lines = F,
+#'   padding = 1:4,
+#'   ref.col = 'blue',
+#'   ref.lty = 'dashed', ref.lwd = 2,
+#'   ref.alpha = 0.5,
+#'   conf = .99999,
+#'   fit.lty = 'dashed', fit.lwd = 2,
+#'   fit.alpha = 0.5,
+#'   conf.alpha = 0.2,
+#'   global = T,
+#'   global.col = 'darkgreen',
+#'   grid = T, loc = 1,
+#'   other = 'none'
+#'  )
+#'
+#'  # vectorized reference aesthetics
+#' multiplot(
+#'   x %>% metaplot(
+#'    sres, gg = F,
+#'    ref.col = c('blue','red'),
+#'    ref.lty = c('dashed','dotted')
+#'   ),
+#'   x %>% metaplot(
+#'    sres, gg = T,
+#'    ref.col = c('blue','red'),
+#'    ref.lty = c('dashed','dotted'),
+#'    padding = 3.5
+#'   )
+#' )
+
+#' multiplot(
+#'   x %>% densplot(
+#'    sres, arm, gg = F,
+#'    ref.col = c('blue','red'),
+#'    ref.lty = c('dashed','dotted')
+#'   ),
+#'   x %>% densplot(
+#'    sres, arm, gg = T,
+#'    ref.col = c('blue','red'),
+#'    ref.lty = c('dashed','dotted'),
+#'    padding = 3.5
+#'   )
+#' )
+
+#' multiplot(
+#'   x %>% densplot(
+#'    sres,, arm, gg = F,
+#'    ref.col = c('blue','red'),
+#'    ref.lty = c('dashed','dotted')
+#'   ),
+#'   x %>% densplot(
+#'    sres,, arm, gg = T,
+#'    ref.col = c('blue','red'),
+#'    ref.lty = c('dashed','dotted'),
+#'    padding = 3.5
+#'  )
+#' )
+
+#' multiplot(
+#'   x %>% metaplot(
+#'    sres, time,, arm, gg = F,
+#'    yref = c(-4,0,4),
+#'    xref = c(5, 10, 15),
+#'    yref.col = c('blue','red'),
+#'    yref.lty = c('dashed','dotted'),
+#'    xref.col = c('green','orange')
+#'   ),
+#'   x %>% metaplot(
+#'    sres, time,, arm, gg = T,
+#'    yref = c(-4,0,4),
+#'    xref = c(5, 10, 15),
+#'    yref.col = c('blue','red'),
+#'    yref.lty = c('dashed','dotted'),
+#'    xref.col = c('green','orange'),
+#'    padding = 3.5
+#'  )
+#' )
+#' # use of settings
+#' multiplot(
+#'  x %>% metaplot(conc, ,subject, settings = list(ncol = 4, nrow = 3), gg = F),
+#'  x %>% metaplot(conc, ,subject, settings = list(ncol = 4), padding = 4, gg = T)
+#' )
+#' multiplot(
+#'  x %>% metaplot(conc, time,, subject, settings = list(ncol = 4, nrow = 3), gg = F),
+#'  x %>% metaplot(conc, time,, subject, settings = list(ncol = 4), padding = 4,  gg = T)
+#' )
+#' multiplot(
+#'  x %>% metaplot(conc, arm, site, settings = list(ncol = 1, nrow = 2), gg = F),
+#'  x %>% metaplot(conc, arm, site, settings = list(ncol = 1), padding = 4,  gg = T)
+#' )
+#'
+#' #iso aesthetics
+#' multiplot(
+#'  x %>% metaplot(conc, ipred, iso = NA, gg = F),
+#'  x %>% metaplot(conc, ipred, iso = NA, gg = T, padding = 4)
+#' )
+#' multiplot(
+#'  x %>% metaplot(conc, ipred, iso = list(lty = 'dashed'), gg = F),
+#'  x %>% metaplot(conc, ipred, iso = list(lty = 'dashed'), gg = T, padding = 4)
+#' )
+#'
+#'}
+test_metaplot <- function()NULL
 

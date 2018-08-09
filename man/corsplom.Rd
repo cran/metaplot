@@ -18,8 +18,16 @@ Scatterplot matrix with correlations.
 Other generic functions: \code{\link{axislabel}},
   \code{\link{categorical}}, \code{\link{densplot}},
   \code{\link{metaplot}}, \code{\link{pack}},
-  \code{\link{scatter}}, \code{\link{unpack}}
+  \code{\link{scatter}}, \code{\link{test_metaplot}},
+  \code{\link{unpack}}
 
 Other corsplom: \code{\link{corsplom.data.frame}},
-  \code{\link{corsplom_data_frame}}
+  \code{\link{corsplom_data_frame}},
+  \code{\link{corsplom_gg_correlation}},
+  \code{\link{corsplom_gg_diagonal}},
+  \code{\link{corsplom_gg_scatter}},
+  \code{\link{corsplom_panel_correlation}},
+  \code{\link{corsplom_panel_scatter}},
+  \code{\link{plot.metaplot_gtable}},
+  \code{\link{print.metaplot_gtable}}
 }

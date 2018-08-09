@@ -5,22 +5,30 @@
 \title{Boxplot Function for Data Frame}
 \usage{
 boxplot_data_frame(x, yvar, xvar, facets = NULL,
-  log = getOption("metaplot_log", FALSE), crit = getOption("metaplot_crit",
-  1.3), horizontal = getOption("metaplot_horizontal", NULL),
-  scales = getOption("metaplot_boxplot_scales", NULL),
-  panel = getOption("metaplot_boxplot_panel", boxplot_panel),
-  ref = getOption("metaplot_ref", metaplot_ref),
-  ref.col = getOption("metaplot_ref.col", "grey"),
-  ref.lty = getOption("metaplot_ref.lty", "solid"),
-  ref.alpha = getOption("metaplot_ref.alpha", 1),
-  nobs = getOption("metaplot_nobs", FALSE),
-  na.rm = getOption("metaplot_na.rm", TRUE), xlab = NULL, ylab = NULL,
-  numlab = getOption("metaplot_lab", axislabel),
-  catlab = getOption("metaplot_lab", axislabel),
-  aspect = getOption("metaplot_aspect", 1),
-  main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
-  NULL), par.settings = standard.theme("pdf", color = FALSE),
-  reverse = getOption("metaplot_boxplot_reverse", TRUE), ...)
+  log = metOption("metaplot_log_boxplot", FALSE),
+  crit = metOption("metaplot_crit_boxplot", 1.3),
+  horizontal = metOption("metaplot_horizontal_boxplot", NULL),
+  scales = metOption("metaplot_scales_boxplot", NULL),
+  panel = metOption("metaplot_panel_boxplot", boxplot_panel),
+  ref = metOption("metaplot_ref_x_boxplot", metaplot_ref),
+  ref.col = metOption("metaplot_ref_col_boxplot", "grey"),
+  ref.lty = metOption("metaplot_ref_lty_boxplot", "solid"),
+  ref.lwd = metOption("metaplot_ref_lwd_boxplot", 1),
+  ref.alpha = metOption("metaplot_ref_alpha_boxplot", 1),
+  nobs = metOption("metaplot_nobs_boxplot", FALSE),
+  na.rm = metOption("metaplot_narm_boxplot", TRUE), xlab = NULL,
+  ylab = NULL, numlab = metOption("metaplot_numlab_boxplot", axislabel),
+  catlab = metOption("metaplot_catlab_boxplot", axislabel),
+  aspect = metOption("metaplot_aspect_boxplot", 1),
+  as.table = metOption("metaplot_astable_boxplot", TRUE),
+  main = metOption("metaplot_main_boxplot", NULL),
+  sub = metOption("metaplot_sub_boxplot", NULL),
+  settings = metOption("metaplot_settings_boxplot", NULL),
+  padding = metOption("metaplot_padding_boxplot", 1),
+  reverse = metOption("metaplot_reverse_boxplot", TRUE),
+  pch = metOption("metaplot_pch_boxplot", "|"),
+  notch = metOption("metaplot_notch_boxplot", FALSE),
+  gg = metOption("metaplot_gg_boxplot", FALSE), ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -35,17 +43,19 @@ boxplot_data_frame(x, yvar, xvar, facets = NULL,
 
 \item{crit}{if log is NA, log-transform if mean/median ratio for non-missing values is greater than this value}
 
-\item{horizontal}{whether box/whisker axis should be horizontal (numeric x, categorical y); defaults TRUE if (var[[2]] is numeric}
+\item{horizontal}{whether box/whisker axis should be horizontal (numeric x, categorical y); defaults TRUE if var[[2]] is numeric}
 
-\item{scales}{passed to \code{\link[lattice]{xyplot}}; can be function(x = x, horizontal, log,...)}
+\item{scales}{passed to \code{\link[lattice]{xyplot}} (should be function(x = x, horizontal, log,...)) or \code{\link[ggplot2]{facet_grid}} or \code{\link[ggplot2]{facet_wrap}}}
 
 \item{panel}{panel function}
 
-\item{ref}{optional reference line(s) on numeric axis; can be function(x = x, var = con, ...)}
+\item{ref}{optional reference line(s) on numeric axis; can be function(x = x, var = con, ...) or NULL to suppress}
 
 \item{ref.col}{color for reference line(s)}
 
 \item{ref.lty}{line type for reference line(s)}
+
+\item{ref.lwd}{line size for reference line(s)}
 
 \item{ref.alpha}{transparency for reference line(s)}
 
@@ -61,15 +71,25 @@ boxplot_data_frame(x, yvar, xvar, facets = NULL,
 
 \item{catlab}{categorical axis label; can be function(x = x, var = catvar, ...)}
 
-\item{aspect}{passed to \code{\link[lattice]{bwplot}}}
+\item{aspect}{passed to \code{\link[lattice]{bwplot}} or ggplot; use 'fill', NA, or NULL to calculate automatically}
+
+\item{as.table}{passed to \code{\link[lattice]{xyplot}}}
 
 \item{main}{character, or a function of x, yvar, xvar, facets, and log}
 
 \item{sub}{character, or a function of x, yvar, xvar, facets, and log}
 
-\item{par.settings}{default parameter settings}
+\item{settings}{default parameter settings: a list from which matching elements are passed to lattice (as par.settings) or  to ggplot theme()  and facet_wrap() or facet_grid().  \code{ncol} and \code{nrow} are used as layout indices for lattice (for homology with facet_wrap).}
+
+\item{padding}{numeric (will be recycled to length 4) giving plot margins in default units: top, right, bottom, left (in multiples of 5.5 points for ggplot)}
 
 \item{reverse}{if y is categorical, present levels in reverse order (first at top)}
+
+\item{pch}{special character for box median: passed to \code{\link[lattice]{panel.bwplot}}}
+
+\item{notch}{whether to draw notched boxes: passed to \code{\link[lattice]{panel.bwplot}}}
+
+\item{gg}{logical: whether to generate \code{ggplot} instead of \code{trellis}}
 
 \item{...}{passed arguments}
 }
@@ -92,5 +112,7 @@ Other boxplot: \code{\link{boxplot.data.frame}}
 Other metaplot: \code{\link{categorical_data_frame}},
   \code{\link{corsplom_data_frame}},
   \code{\link{densplot_data_frame}},
-  \code{\link{metaplot}}, \code{\link{scatter_data_frame}}
+  \code{\link{metaplot_key}}, \code{\link{metaplot}},
+  \code{\link{scatter_data_frame}},
+  \code{\link{test_metaplot}}
 }

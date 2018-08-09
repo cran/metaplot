@@ -5,7 +5,7 @@
 \title{Capture Scalar Column Metadata as Column Attributes}
 \usage{
 \method{pack}{data.frame}(x, meta = getOption("meta", "meta"), as.is = TRUE,
-  attributes = TRUE, ...)
+  attributes = TRUE, na.rm = TRUE, ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -15,6 +15,8 @@
 \item{as.is}{passed to \code{\link[utils]{type.convert}}}
 
 \item{attributes}{preserve non-standard attributes (ignores names, row.names, class)}
+
+\item{na.rm}{if TRUE, NA values (presumably structural) will not be assigned as column attributes.}
 
 \item{...}{ignored arguments}
 }
@@ -54,6 +56,8 @@ Other methods: \code{\link{axislabel.data.frame}},
   \code{\link{corsplom.data.frame}},
   \code{\link{densplot.data.frame}},
   \code{\link{metaplot.data.frame}},
+  \code{\link{plot.metaplot_gtable}},
+  \code{\link{print.metaplot_gtable}},
   \code{\link{scatter.data.frame}},
   \code{\link{unpack.data.frame}}
 }

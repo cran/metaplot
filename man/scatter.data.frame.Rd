@@ -5,7 +5,8 @@
 \title{Scatterplot Method for Data Frame}
 \usage{
 \method{scatter}{data.frame}(x, ..., fun = getOption("metaplot_scatter",
-  "scatter_data_frame"))
+  "scatter_data_frame"), verbose = metOption("metaplot_verbose_scatter",
+  FALSE))
 }
 \arguments{
 \item{x}{data.frame}
@@ -13,6 +14,8 @@
 \item{...}{passed to fun}
 
 \item{fun}{function to draw the plot}
+
+\item{verbose}{generate messages describing process}
 }
 \description{
 Scatterplot method for class 'data.frame'. Parses arguments and generates the call: fun(x, yvar, xvar, groups, facets, ...).
@@ -25,9 +28,11 @@ attr(Theoph$conc,'guide') <- 'mg/L'
 attr(Theoph$Time,'label') <- 'time'
 attr(Theoph$Time,'guide') <- 'h'
 attr(Theoph$Subject,'guide') <- '////'
+# options(metaplot_gg = T)
 scatter(Theoph,conc, Time)
 scatter(Theoph, conc, Time, Subject) # Subject as groups
 scatter(Theoph, conc, Time, , Subject) # Subject as facet
+scatter(Theoph, conc, Time, , Subject, gg = TRUE, scales = 'free_y' )
 scatter(Theoph \%>\% filter(conc > 0), conc, Time, Subject, ylog = TRUE, yref = 5)
 scatter(Theoph, conc, Time, Subject, ysmooth = TRUE)
 scatter(Theoph, conc, Time, conf = TRUE, loc = 3, yref = 6)
@@ -49,7 +54,8 @@ Other bivariate plots: \code{\link{iso_prepanel}},
   \code{\link{metaplot.data.frame}},
   \code{\link{scatter_data_frame}}, \code{\link{scatter}}
 
-Other scatter: \code{\link{scatter_data_frame}},
+Other scatter: \code{\link{metaplot_key}},
+  \code{\link{scatter_data_frame}},
   \code{\link{scatter_panel}}, \code{\link{scatter}}
 
 Other methods: \code{\link{axislabel.data.frame}},
@@ -59,5 +65,7 @@ Other methods: \code{\link{axislabel.data.frame}},
   \code{\link{densplot.data.frame}},
   \code{\link{metaplot.data.frame}},
   \code{\link{pack.data.frame}},
+  \code{\link{plot.metaplot_gtable}},
+  \code{\link{print.metaplot_gtable}},
   \code{\link{unpack.data.frame}}
 }

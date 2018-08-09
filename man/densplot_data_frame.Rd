@@ -5,19 +5,30 @@
 \title{Density Function for Data Frame}
 \usage{
 densplot_data_frame(x, xvar, groups = NULL, facets = NULL,
-  xlab = getOption("metaplot_lab", axislabel),
-  ref = getOption("metaplot_ref", metaplot_ref),
-  ref.col = getOption("metaplot_ref.col", "grey"),
-  ref.lty = getOption("metaplot_ref.lty", "solid"),
-  ref.alpha = getOption("metaplot_ref.alpha", 1),
-  log = getOption("metaplot_log", FALSE), crit = getOption("metaplot_crit",
-  1.3), aspect = getOption("metaplot_aspect", 1),
-  scales = getOption("metaplot_dens.scales", NULL),
-  panel = getOption("metaplot_dens.panel", dens_panel),
-  auto.key = getOption("metaplot_auto.key", NULL),
-  keycols = getOption("metaplot_keycols", NULL),
-  main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
-  NULL), ...)
+  xlab = metOption("metaplot_xlab_dens", axislabel),
+  ref = metOption("metaplot_ref_x_dens", metaplot_ref),
+  ref.col = metOption("metaplot_ref_col_dens", "grey"),
+  ref.lty = metOption("metaplot_ref_lty_dens", "solid"),
+  ref.lwd = metOption("metaplot_ref_lwd_dens", 1),
+  ref.alpha = metOption("metaplot_ref_alpha_dens", 1),
+  log = metOption("metaplot_log_dens", FALSE),
+  crit = metOption("metaplot_crit_dens", 1.3),
+  aspect = metOption("metaplot_aspect_dens", 1),
+  scales = metOption("metaplot_scales_dens", NULL),
+  panel = metOption("metaplot_panel_dens", dens_panel),
+  colors = metOption("metaplot_colors_dens", NULL),
+  symbols = metOption("metaplot_symbols_dens", NULL),
+  points = metOption("metaplot_points_dens", TRUE),
+  lines = metOption("metaplot_lines_dens", TRUE),
+  fill = metOption("metaplot_fill_dens", FALSE),
+  space = metOption("metaplot_space_dens", "right"),
+  key = metOption("metaplot_key_dens", metaplot_key),
+  as.table = metOption("metaplot_astable_dens", TRUE),
+  main = metOption("metaplot_main_dens", NULL),
+  sub = metOption("metaplot_sub_dens", NULL),
+  settings = metOption("metaplot_settings_dens", NULL),
+  padding = metOption("metaplot_padding_dens", 1),
+  gg = metOption("metaplot_gg_dens", FALSE), ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -30,11 +41,13 @@ densplot_data_frame(x, xvar, groups = NULL, facets = NULL,
 
 \item{xlab}{x axis label; can be function(x = x, var = xvar, log = log, ...)}
 
-\item{ref}{reference line; can be function(x = x, var = xvar, ...)}
+\item{ref}{reference line; can be function(x = x, var = xvar, ...) or NULL to suppress}
 
 \item{ref.col}{color for reference line(s)}
 
 \item{ref.lty}{type for reference line(s)}
+
+\item{ref.lwd}{size for reference line(s)}
 
 \item{ref.alpha}{transparency for reference line(s)}
 
@@ -42,19 +55,37 @@ densplot_data_frame(x, xvar, groups = NULL, facets = NULL,
 
 \item{crit}{if log is NA, log-transform if mean/median ratio for non-missing x is greater than this value (and no negative values)}
 
-\item{aspect}{passed to \code{\link[lattice]{densityplot}}}
+\item{aspect}{passed to \code{\link[lattice]{bwplot}} or ggplot; use 'fill', NA, or NULL to calculate automatically}
 
-\item{scales}{passed to \code{\link[lattice]{densityplot}}}
+\item{scales}{passed to \code{\link[lattice]{xyplot}} or \code{\link[ggplot2]{facet_grid}} or \code{\link[ggplot2]{facet_wrap}} (guessed if NULL)}
 
 \item{panel}{passed to \code{\link[lattice]{densityplot}}}
 
-\item{auto.key}{passed to \code{\link[lattice]{densityplot}}}
+\item{colors}{replacements for default colors in group order}
 
-\item{keycols}{number of auto.key columns}
+\item{symbols}{replacements for default symbols in group order}
+
+\item{points}{whether to plot points: logical or alpha, same length as groups}
+
+\item{lines}{whether to plot lines: logical or alpha, same length as groups}
+
+\item{fill}{whether to fill curves: logical or alpha, same length as groups (symbol fill color is same as point color)}
+
+\item{space}{location of key (right, left, top, bottom)}
+
+\item{key}{list: passed to \code{\link[lattice]{xyplot}} as \code{auto.key} or to \code{\link[ggplot2]{theme}}; can be a function groups name, groups levels, points, lines, space, gg, and \dots .  See \code{\link{metaplot_key}}.}
+
+\item{as.table}{passed to \code{\link[lattice]{xyplot}}}
 
 \item{main}{character, or a function of x, xvar, groups, facets, and log}
 
 \item{sub}{character, or a function of x, xvar, groups, facets, and log}
+
+\item{settings}{default parameter settings: a list from which matching elements are passed to lattice (as par.settings) or  to ggplot theme()  and facet_wrap() or facet_grid().  \code{ncol} and \code{nrow} are used as layout indices for lattice (for homology with facet_wrap).}
+
+\item{padding}{numeric (will be recycled to length 4) giving plot margins in default units: top, right, bottom, left (in multiples of 5.5 points for ggplot)}
+
+\item{gg}{logical: whether to generate \code{ggplot} instead of \code{trellis}}
 
 \item{...}{passed to \code{\link[lattice]{densityplot}}}
 }
@@ -64,12 +95,18 @@ Plot density for object of class 'data.frame' using \code{dens_panel} by default
 \examples{
 densplot_data_frame(Theoph, 'conc', grid = TRUE)
 densplot_data_frame(Theoph, 'conc', 'Subject')
+densplot_data_frame(Theoph, 'conc', 'Subject',
+space = 'top', columns = 4, legend.direction = 'horizontal')
+densplot_data_frame(Theoph, 'conc', 'Subject',
+space = 'top', columns = 4, legend.direction = 'horizontal', gg = TRUE)
 densplot_data_frame(Theoph, 'conc', , 'Subject')
 }
 \seealso{
 Other univariate plots: \code{\link{dens_panel}},
   \code{\link{densplot.data.frame}},
-  \code{\link{densplot}}, \code{\link{metaplot.data.frame}}
+  \code{\link{densplot}},
+  \code{\link{metaplot.data.frame}},
+  \code{\link{panel.meta_densityplot}}
 
 Other densplot: \code{\link{densplot.data.frame}},
   \code{\link{densplot}}
@@ -77,5 +114,7 @@ Other densplot: \code{\link{densplot.data.frame}},
 Other metaplot: \code{\link{boxplot_data_frame}},
   \code{\link{categorical_data_frame}},
   \code{\link{corsplom_data_frame}},
-  \code{\link{metaplot}}, \code{\link{scatter_data_frame}}
+  \code{\link{metaplot_key}}, \code{\link{metaplot}},
+  \code{\link{scatter_data_frame}},
+  \code{\link{test_metaplot}}
 }

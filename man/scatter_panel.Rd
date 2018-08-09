@@ -4,24 +4,38 @@
 \alias{scatter_panel}
 \title{Panel Function for Metaplot Scatterplot}
 \usage{
-scatter_panel(x, y, groups, xref = getOption("scatter_panel_ref",
-  scatter_panel_ref), yref = getOption("scatter_panel_ref",
-  scatter_panel_ref), ref.col = getOption("metaplot_ref.col", "grey"),
-  ref.lty = getOption("metaplot_ref.lty", "solid"),
-  ref.alpha = getOption("metaplot_ref.alpha", 1),
-  ysmooth = getOption("metaplot_ysmooth", FALSE),
-  xsmooth = getOption("metaplot_xsmooth", FALSE),
-  smooth.lty = getOption("metaplot_smooth.lty", "dashed"),
-  smooth.alpha = getOption("metaplot_smooth.alpha", 1),
-  fit = getOption("metaplot_fit", conf),
-  fit.lty = getOption("metaplot_fit.lty", "solid"),
-  fit.alpha = getOption("metaplot_fit.alpha", 1),
-  conf = getOption("metaplot_conf", FALSE),
-  conf.alpha = getOption("metaplot_conf.alpha", 0.3),
-  loc = getOption("metaplot_loc", 0), iso = getOption("metaplot_iso",
-  FALSE), global = getOption("metaplot_global", FALSE),
-  global.col = getOption("metaplot_global.col", "grey"),
-  msg = getOption("metaplot_msg", "metastats"), type, ...)
+scatter_panel(x, y, groups, xref = metOption("metaplot_ref_x_scatter_panel",
+  scatter_panel_ref), yref = metOption("metaplot_ref_y_scatter_panel",
+  scatter_panel_ref), ref.col = metOption("metaplot_ref_col_scatter_panel",
+  "grey"), ref.lty = metOption("metaplot_ref_lty_scatter_panel", "solid"),
+  ref.lwd = metOption("metaplot_ref_lwd_scatter_panel", 1),
+  ref.alpha = metOption("metaplot_ref_alpha_scatter_panel", 1),
+  xref.col = metOption("metaplot_ref_col_x_scatter_panel", ref.col),
+  xref.lty = metOption("metaplot_ref_lty_x_scatter_panel", ref.lty),
+  xref.lwd = metOption("metaplot_ref_lwd_x_scatter_panel", ref.lwd),
+  xref.alpha = metOption("metaplot_ref_alpha_x_scatter_panel", ref.alpha),
+  yref.col = metOption("metaplot_ref_col_y_scatter_panel", ref.col),
+  yref.lty = metOption("metaplot_ref_lty_y_scatter_panel", ref.lty),
+  yref.lwd = metOption("metaplot_ref_lwd_Y-scatter_panel", ref.lwd),
+  yref.alpha = metOption("metaplot_ref_alpha_y_scatter_panel", ref.alpha),
+  ysmooth = metOption("metaplot_smooth_y_scatter_panel", FALSE),
+  xsmooth = metOption("metaplot_smooth_x_scatter_panel", FALSE),
+  smooth.lty = metOption("metaplot_smooth_lty_scatter_panel", "dashed"),
+  smooth.lwd = metOption("metaplot_smooth_lwd_scatter_panel", 1),
+  smooth.alpha = metOption("metaplot_smooth_alpha_scatter_panel", 1),
+  fit = metOption("metaplot_fit_plot_scatter_panel", conf),
+  fit.lty = metOption("metaplot_fit_lty_scatter_panel", "solid"),
+  fit.lwd = metOption("metaplot_fit_lwd_scatter_panel", 1),
+  fit.alpha = metOption("metaplot_fit_alpha_scatter_panel", 1),
+  conf = metOption("metaplot_conf_plot_scatter_panel", FALSE),
+  conf.alpha = metOption("metaplot_conf_alpha_scatter_panel", 0.3),
+  loc = metOption("metaplot_msg_loc_scatter_panel", 0),
+  iso = metOption("metaplot_iso_scatter_panel", FALSE),
+  global = metOption("metaplot_global_aes_scatter_panel", FALSE),
+  global.col = metOption("metaplot_global_col_scatter_panel", "grey"),
+  global.fill = metOption("metaplot_global_fill_scatter_panel", "grey"),
+  msg = metOption("metaplot_msg_format_scatter_panel", "metastats"), type,
+  ...)
 }
 \arguments{
 \item{x}{x values}
@@ -34,11 +48,29 @@ scatter_panel(x, y, groups, xref = getOption("scatter_panel_ref",
 
 \item{yref}{reference line from y axis; can be function(y, x, ...)}
 
-\item{ref.col}{reference line color}
+\item{ref.col}{default shared by \code{xref.col} and \code{yref.col}}
 
-\item{ref.lty}{reference line type}
+\item{ref.lty}{default shared by \code{xref.lty} and \code{yref.lty}}
 
-\item{ref.alpha}{reference line alpha}
+\item{ref.lwd}{default shared by \code{xref.lwd} and \code{yref.lwd}}
+
+\item{ref.alpha}{default shared by \code{xref.alpha} and \code{yref.alpha}}
+
+\item{xref.col}{x reference line color (recycled)}
+
+\item{xref.lty}{x reference line type (recycled)}
+
+\item{xref.lwd}{x reference line size (recycled)}
+
+\item{xref.alpha}{x reference line alpha (recycled)}
+
+\item{yref.col}{y reference line color (recycled)}
+
+\item{yref.lty}{y reference line type (recycled)}
+
+\item{yref.lwd}{y reference line size (recycled)}
+
+\item{yref.alpha}{y reference line alpha (recycled)}
 
 \item{ysmooth}{supply loess smooth of y on x}
 
@@ -46,11 +78,15 @@ scatter_panel(x, y, groups, xref = getOption("scatter_panel_ref",
 
 \item{smooth.lty}{smooth line type}
 
+\item{smooth.lwd}{smooth line size}
+
 \item{smooth.alpha}{smooth alpha}
 
 \item{fit}{draw a linear fit of y ~ x}
 
 \item{fit.lty}{fit line type}
+
+\item{fit.lwd}{fit line size}
 
 \item{fit.alpha}{fit alpha}
 
@@ -60,11 +96,13 @@ scatter_panel(x, y, groups, xref = getOption("scatter_panel_ref",
 
 \item{loc}{where to print statistics on a panel; suppressed for grouped plots}
 
-\item{iso}{use isometric axes with line of unity (auto-selected if NA)}
+\item{iso}{logical: use isometric axes with line of unity (auto-selected if NA); can be a (partial) list of aesthetics (col, lty, lwd, alpha)}
 
 \item{global}{if TRUE, xsmooth, ysmooth, fit, and conf are applied to all data rather than groupwise}
 
 \item{global.col}{color for global aesthetics}
+
+\item{global.fill}{fill color for global aesthetics}
 
 \item{msg}{a function to print text on a panel: called with x values, y values, and \dots.}
 
@@ -82,14 +120,19 @@ Default panel function for scatter_data_frame. Calls \code{\link[lattice]{panel.
 
 Other panel functions: \code{\link{boxplot_panel}},
   \code{\link{categorical_panel}},
+  \code{\link{corsplom_gg_correlation}},
+  \code{\link{corsplom_gg_diagonal}},
+  \code{\link{corsplom_gg_scatter}},
   \code{\link{corsplom_panel_correlation}},
   \code{\link{corsplom_panel_diagonal}},
   \code{\link{corsplom_panel_scatter}},
   \code{\link{dens_panel}}, \code{\link{diag_label}},
   \code{\link{diag_pin}}, \code{\link{iso_prepanel}},
-  \code{\link{metaplot_ref}}, \code{\link{panel_tile}},
-  \code{\link{scatter_panel_ref}}
+  \code{\link{metaplot_key}}, \code{\link{metaplot_ref}},
+  \code{\link{panel.meta_densityplot}},
+  \code{\link{panel_tile}}, \code{\link{scatter_panel_ref}}
 
-Other scatter: \code{\link{scatter.data.frame}},
+Other scatter: \code{\link{metaplot_key}},
+  \code{\link{scatter.data.frame}},
   \code{\link{scatter_data_frame}}, \code{\link{scatter}}
 }

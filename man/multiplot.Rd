@@ -2,19 +2,19 @@
 % Please edit documentation in R/multiplot.R
 \name{multiplot}
 \alias{multiplot}
-\title{Arrange Multiple Plots in a Grid}
+\title{Arrange Multiple Trellis or GG Plots in a Grid}
 \usage{
 multiplot(..., nrow = NULL, ncol = NULL)
 }
 \arguments{
-\item{...}{trellis objects}
+\item{...}{trellis or ggplot objects}
 
 \item{nrow}{number of rows of plots}
 
 \item{ncol}{number of columns of plots}
 }
 \description{
-Arranges mutiple trellis plots in a grid, automatically choosing number of rows and columns.  By default, number of rows is one less than or equal to the number of columns.
+Arranges mutiple trellis plots or ggplots in a grid, automatically choosing number of rows and columns.  By default, number of rows is one less than or equal to the number of columns.
 }
 \examples{
 library(lattice)
@@ -35,4 +35,8 @@ multiplot(a,a,a,a,a,a,a,a, nrow = 2)
 multiplot(a,a,a,a,a,a,a,a, ncol = 4)
 multiplot(a,a,a,a,a,a,a,a, ncol = 2)
 multiplot(a,a,a,a,a,a,a,a, ncol = 4, nrow = 3)
+multiplot(multiplot(a,a), a)
+}
+\seealso{
+\code{\link[gridExtra]{grid.arrange}}
 }

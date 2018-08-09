@@ -5,50 +5,134 @@
 \title{Correlated Scatterplot Matrix Function for Data Frame}
 \usage{
 corsplom_data_frame(x, xvar = names(x),
-  upper.panel = getOption("metaplot_upper.panel", corsplom_panel_scatter),
-  lower.panel = getOption("metaplot_lower.panel", corsplom_panel_correlation),
-  diag.panel = getOption("metaplot_diag.panel", corsplom_panel_diagonal),
-  pscales = getOption("metaplot_pscales", 0),
-  xlab = getOption("metaplot_corsplom_xlab", NULL),
-  varname.cex = getOption("metaplot_varname.cex", 1),
-  main = getOption("metaplot_main", NULL), sub = getOption("metaplot_sub",
-  NULL), ...)
+  upper.panel = metOption("metaplot_upperpanel_corsplom", if (gg)
+  corsplom_gg_scatter else corsplom_panel_scatter),
+  lower.panel = metOption("metaplot_lowerpanel_corsplom", if (gg)
+  corsplom_gg_correlation else corsplom_panel_correlation),
+  diag.panel = metOption("metaplot_diagpanel_corsplom", if (gg)
+  corsplom_gg_diagonal else corsplom_panel_diagonal),
+  pscales = metOption("metaplot_pscales_corsplom", 0),
+  xlab = metOption("metaplot_xlab_corsplom", NULL),
+  varname.cex = metOption("metaplot_varname_cex_corsplom", 1),
+  main = metOption("metaplot_main_corsplom", NULL),
+  sub = metOption("metaplot_sub_corsplom", NULL),
+  col = metOption("metaplot_point_col_corsplom", "blue"),
+  smooth.col = metOption("metaplot_smooth_col_corsplom", col),
+  smooth.lty = metOption("metaplot_smooth_lty_corsplom", "solid"),
+  smooth.lwd = metOption("metaplot_smooth_lwd_corsplom", 1),
+  smooth.alpha = metOption("metaplot_smooth_alpha_corsplom", 1),
+  density = metOption("metaplot_density_corsplom", TRUE),
+  diag.label = metOption("metaplot_diag_label_corsplom", diag_label),
+  pin = metOption("metaplot_pin_loc_corsplom", diag_pin),
+  pin.col = metOption("metaplot_pin_col_corsplom", "darkgrey"),
+  pin.alpha = metOption("metaplot_pin_alpha_corsplom", 1),
+  dens.col = metOption("metaplot_dens_col_corsplom", "grey"),
+  dens.scale = metOption("metaplot_dens_scale_corsplom", 0.2),
+  dens.alpha = metOption("metaplot_dens_alpha_corsplom", 0.5),
+  settings = metOption("metaplot_settings_corsplom", NULL),
+  padding = metOption("metaplot_padding_corsplom", 1),
+  as.table = metOption("metaplot_astable_corsplom", FALSE),
+  dens.up = metOption("metaplot_updens_corsplom", TRUE),
+  gg = metOption("metaplot_gg_corsplom", FALSE), ...)
 }
 \arguments{
 \item{x}{data.frame}
 
 \item{xvar}{variables to plot}
 
-\item{upper.panel}{passed to splom}
+\item{upper.panel}{passed to \code{\link[lattice]{splom}} or ggplot}
 
-\item{lower.panel}{passed to splom}
+\item{lower.panel}{passed to \code{\link[lattice]{splom}} or ggplot}
 
-\item{diag.panel}{passed to splom}
+\item{diag.panel}{passed to \code{\link[lattice]{splom}} or ggplot}
 
-\item{pscales}{passed to splom}
+\item{pscales}{passed to \code{\link[lattice]{splom}}}
 
-\item{xlab}{passed to splom, can be function(x = x, var = xvar, ...)}
+\item{xlab}{can be function(x = x, var = xvar, ...)}
 
-\item{varname.cex}{passed to splom}
+\item{varname.cex}{text size multiplier}
 
 \item{main}{character, or a function of x, xvar}
 
 \item{sub}{character, or a function of x, xvar}
 
-\item{...}{extra arguments passed to \code{\link[lattice]{splom}}}
+\item{col}{point color}
+
+\item{smooth.col}{smooth color}
+
+\item{smooth.lty}{smooth line type}
+
+\item{smooth.lwd}{smooth line size}
+
+\item{smooth.alpha}{smooth alpha}
+
+\item{density}{whether to plot density polygons}
+
+\item{diag.label}{label for the diagonal; can be a function of x, varname, .data}
+
+\item{pin}{location for a pin (reference line) in the density region; can be function(x, varname, .data) or NULL to suppress}
+
+\item{pin.col}{color of pin, if any}
+
+\item{pin.alpha}{alpha transparency of pin}
+
+\item{dens.col}{color for density region}
+
+\item{dens.scale}{inflation factor for height of density smooth}
+
+\item{dens.alpha}{alpha transparency for density region}
+
+\item{settings}{default parameter settings: a list from which matching elements are passed to lattice (as par.settings) or  to ggplot theme()}
+
+\item{padding}{numeric (will be recycled to length 4) giving plot margins in default units: top, right, bottom, left (in multiples of 5.5 points for ggplot)}
+
+\item{as.table}{diagonal arranged top-left to bottom-right}
+
+\item{dens.up}{whether density plots in diagonal should face the upper triangle vs. lower}
+
+\item{gg}{logical: whether to generate \code{ggplot} instead of \code{trellis}}
+
+\item{...}{extra arguments passed to \code{\link[lattice]{splom}} and ggplot}
+}
+\value{
+trellis or grob
 }
 \description{
 Creates a scatterplot matrix with correlations in lower panel, by default.
+}
+\examples{
+
+library(magrittr)
+library(dplyr)
+library(csv)
+x <- as.csv(system.file(package = 'metaplot', 'extdata/theoph.csv'))
+x \%<>\% pack
+# options(metaplot_gg = TRUE)
+x \%>\% metaplot(lKe, lKa, lCl)
+x \%>\% metaplot(
+  lKe, lKa, lCl,
+  col = 'black',smooth.col = 'red', pin.col = 'red',
+  dens.col='blue',dens.alpha = 0.1
+)
 }
 \seealso{
 Other multivariate plots: \code{\link{corsplom.data.frame}},
   \code{\link{metaplot.data.frame}}
 
 Other corsplom: \code{\link{corsplom.data.frame}},
-  \code{\link{corsplom}}
+  \code{\link{corsplom_gg_correlation}},
+  \code{\link{corsplom_gg_diagonal}},
+  \code{\link{corsplom_gg_scatter}},
+  \code{\link{corsplom_panel_correlation}},
+  \code{\link{corsplom_panel_scatter}},
+  \code{\link{corsplom}},
+  \code{\link{plot.metaplot_gtable}},
+  \code{\link{print.metaplot_gtable}}
 
 Other metaplot: \code{\link{boxplot_data_frame}},
   \code{\link{categorical_data_frame}},
   \code{\link{densplot_data_frame}},
-  \code{\link{metaplot}}, \code{\link{scatter_data_frame}}
+  \code{\link{metaplot_key}}, \code{\link{metaplot}},
+  \code{\link{scatter_data_frame}},
+  \code{\link{test_metaplot}}
 }

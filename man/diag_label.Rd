@@ -5,9 +5,9 @@
 \title{Format a Diagonal Label}
 \usage{
 diag_label(varname, .data,
-  diag_label_simple = getOption("metaplot_diag_label_simple", FALSE),
-  diag_label_split = getOption("metaplot_diag_label_split", TRUE),
-  diag_symbol_format = getOption("metaplot_diag_symbol_format",
+  diag_label_simple = metOption("metaplot_diag_label_simple", FALSE),
+  diag_label_split = metOption("metaplot_diag_label_split", TRUE),
+  diag_symbol_format = metOption("metaplot_diag_symbol_format",
   "wikisym2plotmath"), ...)
 }
 \arguments{
@@ -32,11 +32,16 @@ Formats a diagonal label. Can return a simple column name, a column label (if at
 \seealso{
 Other panel functions: \code{\link{boxplot_panel}},
   \code{\link{categorical_panel}},
+  \code{\link{corsplom_gg_correlation}},
+  \code{\link{corsplom_gg_diagonal}},
+  \code{\link{corsplom_gg_scatter}},
   \code{\link{corsplom_panel_correlation}},
   \code{\link{corsplom_panel_diagonal}},
   \code{\link{corsplom_panel_scatter}},
   \code{\link{dens_panel}}, \code{\link{diag_pin}},
-  \code{\link{iso_prepanel}}, \code{\link{metaplot_ref}},
+  \code{\link{iso_prepanel}}, \code{\link{metaplot_key}},
+  \code{\link{metaplot_ref}},
+  \code{\link{panel.meta_densityplot}},
   \code{\link{panel_tile}},
   \code{\link{scatter_panel_ref}},
   \code{\link{scatter_panel}}
