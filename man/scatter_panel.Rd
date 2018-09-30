@@ -4,38 +4,38 @@
 \alias{scatter_panel}
 \title{Panel Function for Metaplot Scatterplot}
 \usage{
-scatter_panel(x, y, groups, xref = metOption("metaplot_ref_x_scatter_panel",
-  scatter_panel_ref), yref = metOption("metaplot_ref_y_scatter_panel",
-  scatter_panel_ref), ref.col = metOption("metaplot_ref_col_scatter_panel",
-  "grey"), ref.lty = metOption("metaplot_ref_lty_scatter_panel", "solid"),
-  ref.lwd = metOption("metaplot_ref_lwd_scatter_panel", 1),
-  ref.alpha = metOption("metaplot_ref_alpha_scatter_panel", 1),
-  xref.col = metOption("metaplot_ref_col_x_scatter_panel", ref.col),
-  xref.lty = metOption("metaplot_ref_lty_x_scatter_panel", ref.lty),
-  xref.lwd = metOption("metaplot_ref_lwd_x_scatter_panel", ref.lwd),
-  xref.alpha = metOption("metaplot_ref_alpha_x_scatter_panel", ref.alpha),
-  yref.col = metOption("metaplot_ref_col_y_scatter_panel", ref.col),
-  yref.lty = metOption("metaplot_ref_lty_y_scatter_panel", ref.lty),
-  yref.lwd = metOption("metaplot_ref_lwd_Y-scatter_panel", ref.lwd),
-  yref.alpha = metOption("metaplot_ref_alpha_y_scatter_panel", ref.alpha),
-  ysmooth = metOption("metaplot_smooth_y_scatter_panel", FALSE),
-  xsmooth = metOption("metaplot_smooth_x_scatter_panel", FALSE),
-  smooth.lty = metOption("metaplot_smooth_lty_scatter_panel", "dashed"),
-  smooth.lwd = metOption("metaplot_smooth_lwd_scatter_panel", 1),
-  smooth.alpha = metOption("metaplot_smooth_alpha_scatter_panel", 1),
-  fit = metOption("metaplot_fit_plot_scatter_panel", conf),
-  fit.lty = metOption("metaplot_fit_lty_scatter_panel", "solid"),
-  fit.lwd = metOption("metaplot_fit_lwd_scatter_panel", 1),
-  fit.alpha = metOption("metaplot_fit_alpha_scatter_panel", 1),
-  conf = metOption("metaplot_conf_plot_scatter_panel", FALSE),
-  conf.alpha = metOption("metaplot_conf_alpha_scatter_panel", 0.3),
-  loc = metOption("metaplot_msg_loc_scatter_panel", 0),
-  iso = metOption("metaplot_iso_scatter_panel", FALSE),
-  global = metOption("metaplot_global_aes_scatter_panel", FALSE),
-  global.col = metOption("metaplot_global_col_scatter_panel", "grey"),
-  global.fill = metOption("metaplot_global_fill_scatter_panel", "grey"),
-  msg = metOption("metaplot_msg_format_scatter_panel", "metastats"), type,
-  ...)
+scatter_panel(x, y, groups, xref = metOption("xref_scatter_panel",
+  scatter_panel_ref), yref = metOption("yref_scatter_panel",
+  scatter_panel_ref), ref.col = metOption("ref.col_scatter_panel", "grey"),
+  ref.lty = metOption("ref.lty_scatter_panel", "solid"),
+  ref.lwd = metOption("ref.lwd_scatter_panel", 1),
+  ref.alpha = metOption("ref.alpha_scatter_panel", 1),
+  xref.col = metOption("xref.col_scatter_panel", NULL),
+  xref.lty = metOption("xref.lty_scatter_panel", NULL),
+  xref.lwd = metOption("xref_lwd_scatter_panel", NULL),
+  xref.alpha = metOption("xref_alpha_scatter_panel", NULL),
+  yref.col = metOption("yref_col_scatter_panel", NULL),
+  yref.lty = metOption("yref_lty_scatter_panel", NULL),
+  yref.lwd = metOption("yref_lwd_scatter_panel", NULL),
+  yref.alpha = metOption("yref_alpha_scatter_panel", NULL),
+  ysmooth = metOption("ysmooth_scatter_panel", FALSE),
+  xsmooth = metOption("xsmooth_scatter_panel", FALSE),
+  smooth.lty = metOption("smooth.lty_scatter_panel", "dashed"),
+  smooth.lwd = metOption("smooth.lwd_scatter_panel", 1),
+  smooth.alpha = metOption("smooth.alpha_scatter_panel", 1),
+  fit = metOption("fit_scatter_panel", NULL),
+  fit.lty = metOption("fit.lty_scatter_panel", "solid"),
+  fit.lwd = metOption("fit.lwd_scatter_panel", 1),
+  fit.alpha = metOption("fit.alpha_scatter_panel", 1),
+  conf = metOption("conf_scatter_panel", FALSE),
+  conf.alpha = metOption("conf.alpha_scatter_panel", 0.3),
+  loc = metOption("loc_scatter_panel", 0),
+  iso = metOption("iso_scatter_panel", FALSE),
+  global = metOption("global_scatter_panel", FALSE),
+  global.col = metOption("global.col_scatter_panel", "grey"),
+  global.fill = metOption("global.fill_scatter_panel", "grey"),
+  msg = metOption("msg_scatter_panel", "metastats"), type,
+  verbose = metOption("verbose_scatter_panel", FALSE), ...)
 }
 \arguments{
 \item{x}{x values}
@@ -82,7 +82,7 @@ scatter_panel(x, y, groups, xref = metOption("metaplot_ref_x_scatter_panel",
 
 \item{smooth.alpha}{smooth alpha}
 
-\item{fit}{draw a linear fit of y ~ x}
+\item{fit}{draw a linear fit of y ~ x; defaults to \code{as.logical(conf)}}
 
 \item{fit.lty}{fit line type}
 
@@ -108,10 +108,15 @@ scatter_panel(x, y, groups, xref = metOption("metaplot_ref_x_scatter_panel",
 
 \item{type}{overridden by scatter_panel}
 
+\item{verbose}{generate messages describing process}
+
 \item{...}{passed to panel.superpose, panel.xyplot, panel.polygon, region, panel.text}
 }
 \description{
-Default panel function for scatter_data_frame. Calls \code{\link[lattice]{panel.xyplot}} and optionally plots linear fit, confidence region, reference lines, and statistics.
+Default panel function for scatter_data_frame. Calls \code{\link[lattice]{panel.xyplot}}
+and optionally plots linear fit, confidence region, reference lines, and statistics.
+Note that, although global options are supported, typically these are unreachable
+since the calling function supplies appropriate values.
 }
 \seealso{
 \code{\link{metastats}}

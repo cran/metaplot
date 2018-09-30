@@ -5,15 +5,16 @@
 \title{Diagonal Panel Function for Metaplot Corsplom}
 \usage{
 corsplom_panel_diagonal(x, varname, .data, density = TRUE,
-  diag.label = metOption("metaplot_diag_label_corsplom_panel", diag_label),
-  pin = metOption("metaplot_pin_loc_corsplom_panel", diag_pin),
-  pin.col = metOption("metaplot_pin_col_corsplom_panel", "darkgrey"),
-  pin.alpha = metOption("metaplot_pin_alpha_corsplom_panel", 1),
-  dens.col = metOption("metaplot_dens_col_corsplom_panel", "grey"),
-  dens.scale = metOption("metaplot_dens_scale_corsplom_panel", 0.2),
-  dens.alpha = metOption("metaplot_dens_alpha_corsplom_panel", 0.5),
-  as_table = metOption("metaplot_astable_corsplom_panel", FALSE),
-  dens.up = metOption("metaplot_densup_corsplom_panel", TRUE), ...)
+  diag.label = metOption("diag_label_corsplom_panel", diag_label),
+  pin = metOption("pin_loc_corsplom_panel", diag_pin),
+  pin.col = metOption("pin_col_corsplom_panel", "darkgrey"),
+  pin.alpha = metOption("pin_alpha_corsplom_panel", 1),
+  dens.col = metOption("dens_col_corsplom_panel", "grey"),
+  dens.scale = metOption("dens_scale_corsplom_panel", 0.2),
+  dens.alpha = metOption("dens_alpha_corsplom_panel", 0.5),
+  as.table = metOption("as.table_corsplom_panel", FALSE),
+  dens.up = metOption("densup_corsplom_panel", TRUE),
+  verbose = metOption("verbose_corsplom_panel", FALSE), ...)
 }
 \arguments{
 \item{x}{numeric}
@@ -38,11 +39,13 @@ corsplom_panel_diagonal(x, varname, .data, density = TRUE,
 
 \item{dens.alpha}{alpha transparency for density region}
 
+\item{as.table}{diagonal arranged top-left to bottom-right}
+
 \item{dens.up}{whether density plots should face the upper triangle (or lower, if FALSE)}
 
-\item{...}{passed arguments}
+\item{verbose}{generate messages describing process}
 
-\item{as.table}{diagonal arranged top-left to bottom-right}
+\item{...}{passed arguments}
 }
 \description{
 Default diagonal panel function for corsplom_data_frame. Plots a density smooth against the corresponding axis from within the diagonal panel.  Plots a grey pin at each axis zero.

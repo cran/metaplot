@@ -4,8 +4,8 @@
 \alias{densplot.data.frame}
 \title{Densplot Method for Data Frame}
 \usage{
-\method{densplot}{data.frame}(x, ..., fun = getOption("metaplot_densplot",
-  "densplot_data_frame"), verbose = metOption("metaplot_verbose_densplot",
+\method{densplot}{data.frame}(x, ..., fun = metOption("densplot",
+  "densplot_data_frame"), verbose = metOption("verbose_densplot_data_frame",
   FALSE))
 }
 \arguments{

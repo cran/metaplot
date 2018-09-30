@@ -55,6 +55,7 @@ axislabel.data.frame <- function(x, var, log = FALSE, ...){
 #' @param smooth.lty smooth line type
 #' @param smooth.lwd smooth line size
 #' @param smooth.alpha smooth alpha
+#' @param verbose generate messages describing process
 #' @param ... passed arguments
 #' @keywords internal
 #' @export
@@ -63,13 +64,15 @@ axislabel.data.frame <- function(x, var, log = FALSE, ...){
 corsplom_panel_scatter = function(
   x,
   y,
-  col = metOption('metaplot_point_col_corsplom_panel','#0080ff'),
-  smooth.col = metOption('metaplot_smooth_col_corsplom_panel',col),
-  smooth.lty = metOption('metaplot_smooth_lty_corspom_panel','solid'),
-  smooth.lwd = metOption('metaplot_smooth_lwd_corspom_panel',1),
-  smooth.alpha = metOption('metaplot_smooth_alpha_corsplom_panel',1),
+  col = metOption('point_col_corsplom_panel','#0080ff'),
+  smooth.col = metOption('smooth_col_corsplom_panel',col),
+  smooth.lty = metOption('smooth_lty_corspom_panel','solid'),
+  smooth.lwd = metOption('smooth_lwd_corspom_panel',1),
+  smooth.alpha = metOption('smooth_alpha_corsplom_panel',1),
+  verbose = metOption('verbose_corsplom_panel'),
   ...
 ){
+  if(verbose)cat('this is corsplom_panel_scatter calling panel.xyplot')
   panel.xyplot(x,y,col = col, ...)
   try(silent = TRUE, suppressWarnings(panel.loess(x,y,col = smooth.col, lty = smooth.lty, lwd = smooth.lwd, alpha = smooth.alpha)))
 }
@@ -80,12 +83,14 @@ corsplom_panel_scatter = function(
 #' @param x x values
 #' @param y y values
 #' @param use passed to \code{\link[stats]{cor}}
+#' @param verbose generate messages describing process
 #' @param ... passed arguments
 #' @keywords internal
 #' @export
 #' @family panel functions
 #' @family corsplom
-corsplom_panel_correlation = function(x, y, use = 'pairwise.complete.obs',...) {
+corsplom_panel_correlation = function(x, y, use = 'pairwise.complete.obs', verbose = FALSE,...) {
+  if(verbose)cat('this is corsplom_panel_correlation calling panel.text')
   x1 <- range(x,na.rm = T)
   y1 <- range(y,na.rm = T)
   x0 <- min(x1)+(max(x1)-min(x1))/2
@@ -111,6 +116,7 @@ corsplom_panel_correlation = function(x, y, use = 'pairwise.complete.obs',...) {
 #' @param dens.alpha alpha transparency for density region
 #' @param as.table diagonal arranged top-left to bottom-right
 #' @param dens.up whether density plots should face the upper triangle (or lower, if FALSE)
+#' @param verbose generate messages describing process
 #' @param ... passed arguments
 #' @keywords internal
 #' @export
@@ -121,18 +127,20 @@ corsplom_panel_diagonal <- function(
   varname,
   .data,
   density = TRUE,
-  diag.label = metOption('metaplot_diag_label_corsplom_panel',diag_label),
-  pin = metOption('metaplot_pin_loc_corsplom_panel',diag_pin),
-  pin.col = metOption('metaplot_pin_col_corsplom_panel','darkgrey'),
-  pin.alpha = metOption('metaplot_pin_alpha_corsplom_panel',1),
-  dens.col = metOption('metaplot_dens_col_corsplom_panel','grey'),
-  dens.scale = metOption('metaplot_dens_scale_corsplom_panel',0.2),
-  dens.alpha = metOption('metaplot_dens_alpha_corsplom_panel',0.5),
-  as_table = metOption('metaplot_astable_corsplom_panel', FALSE),
-  dens.up = metOption('metaplot_densup_corsplom_panel',TRUE),
+  diag.label = metOption('diag_label_corsplom_panel',diag_label),
+  pin = metOption('pin_loc_corsplom_panel',diag_pin),
+  pin.col = metOption('pin_col_corsplom_panel','darkgrey'),
+  pin.alpha = metOption('pin_alpha_corsplom_panel',1),
+  dens.col = metOption('dens_col_corsplom_panel','grey'),
+  dens.scale = metOption('dens_scale_corsplom_panel',0.2),
+  dens.alpha = metOption('dens_alpha_corsplom_panel',0.5),
+  as.table = metOption('as.table_corsplom_panel', FALSE),
+  dens.up = metOption('densup_corsplom_panel',TRUE),
+  verbose = metOption('verbose_corsplom_panel',FALSE),
   ...
 ){
-  as.table <- as_table
+  if(verbose)cat('this is corsplom_panel_diagonal')
+  #as.table <- as_table
   i <- match(varname,names(.data))
   ncol <- length(names(.data))
 
@@ -281,7 +289,7 @@ corsplom_panel_diagonal <- function(
   }
   if(is.character(diag.label))diag.label <- match.fun(diag.label)
   if(is.function(diag.label))diag.label <- diag.label(varname = varname, .data = .data, ...)
-
+  if(verbose)cat('calling diag.panel.splom')
   diag.panel.splom(varname = diag.label, ...)
 }
 
@@ -346,13 +354,18 @@ scatter_panel_ref <- function(a, b, ...){
 #' @param diag_label_simple logical: just return varname?
 #' @param diag_label_split whether to substitute line breaks for spaces
 #' @param diag_symbol_format function to process symbol attribute, if present
+#' @param verbose generate messages describing process
 #' @param ... ignored
 #'
-diag_label <- function(varname, .data,
-diag_label_simple = metOption('metaplot_diag_label_simple',FALSE),
-diag_label_split = metOption('metaplot_diag_label_split',TRUE),
-diag_symbol_format = metOption('metaplot_diag_symbol_format','wikisym2plotmath'),
-...){
+diag_label <- function(
+  varname, .data,
+  diag_label_simple = metOption('diag_label_simple',FALSE),
+  diag_label_split = metOption('diag_label_split',TRUE),
+  diag_symbol_format = metOption('diag_symbol_format','wikisym2plotmath'),
+  verbose = metOption('verbose_diag_label', FALSE),
+  ...
+){
+  if(verbose)cat('this is diag_label')
   stopifnot(length(varname) == 1)
   stopifnot(is.data.frame(.data))
   if(diag_label_simple) return(varname)
@@ -449,6 +462,8 @@ wikisym2plotmath_ <- function(x,...){
 #' Execute Linear Model
 #'
 #' Executes a linear model, automatically choosing binomial family as necessary.
+#' @export
+#' @keywords internal
 #' @param x x values
 #' @param y y values
 #' @param family gaussian by default, or binomial for all y either zero or 1
@@ -465,6 +480,8 @@ model <- function(x, y, family = if(all(y %in% 0:1,na.rm = TRUE)) 'binomial' els
 #' Calculate a Confidence Region
 #'
 #' Calculates a confidence region. \code{se.fit} from \code{\link[stats]{predict.glm}} is multiplied by \code{z} and added or subtracted from fits to give \code{hi} and \code{lo} columns in return value.  \code{z} is normal quantile for the one-tailed probablitity corresponding to \code{conf}, e.g. ~ 1.96 for \code{conf = 0.95}. If non-missing \code{y} is only 0 or 1, the model family is binomial and resulting confidence intervals are back-transformed using \code{\link[stats]{plogis}}.
+#' @export
+#' @keywords internal
 #' @param x x values
 #' @param y y values
 #' @param family gaussian by default, or binomial for all y either zero or 1
@@ -634,17 +651,20 @@ base_breaks <- function(n = 10){
     axisTicks(log(range(x, na.rm = TRUE)), log = TRUE, n = n)
   }
 }
-#' Get Option with Partial Matching
+#' Get Metaplot Option with Partial Matching
 #'
-#' Gets an option value.  Selects the longest among all leading partial matches.
-#' (Ties are broken by sorting and taking the first.)
-#' This allows multiple options to be set simultaneously, and allows a subset of these to be overridden.
-#' The intended effect is similar to cascading style sheets.
+#' Gets a metaplot option value from  the named list \code{getOption('metaplot')}.
+#' If an exact match is not found, trailing elements of x, separated by underscore,
+#' are removed one at a time in search of a partial match. Thus 'ref.col' will match
+#' for 'ref.col_dens' and 'ref.col_scatter' if neither of these is set (allowing
+#' selective override). However, global' will never match 'global.col'.
+#'
+#' If x is missing a list of all metaplot options is returned.
 #'
 #' @param x a character string holding an option name
 #' @param default the value returned if option is not set
 #' @export
-#' @seealso \code{\link{getOption}}
+#' @seealso \code{\link{getOption}} \code{\link{setOption}}
 #' @examples
 #'
 #' library(magrittr)
@@ -666,10 +686,10 @@ base_breaks <- function(n = 10){
 #' x$conc %<>% structure(reference = 9)
 #'
 #' # Make the reference line green universally.
-#' options(metaplot_ref_col = 'green')
+#' setOption(ref_col = 'green')
 #'
 #' # Make the reference line orange for density plots
-#' options(metaplot_ref_col_dens = 'orange')
+#' setOption(ref_col_dens = 'orange')
 #'
 #' multiplot(
 #' x %>% metaplot(conc, gg = F),
@@ -679,20 +699,53 @@ base_breaks <- function(n = 10){
 #' )
 #'
 #' # Restore defaults
-#' options(metaplot_ref_col = NULL)
-#' options(metaplot_ref_col_dens = NULL)
+#' # setOption() # clears all metaplot options
+#' setOption(ref_col = NULL)
+#' setOption(ref_col_dens = NULL)
 
 
 metOption <- function(x, default = NULL){
-  nms <- names(options())
-  nms <- nms[startsWith(x,nms)]
-  if(!length(nms)) return(default)
-  len <- nchar(nms)
-  max <- max(len)
-  nms <- nms[len == max]
-  nms <- sort(nms)
-  nm <- nms[[1]]
-  getOption(nm, default = default)
+  mops <- getOption('metaplot',list())
+  if(missing(x))return(mops)
+  stopifnot(is.character(x))
+  stopifnot(length(x) == 1)
+  stopifnot(is.list(mops))
+  if(is.null(names(mops))) return(default)
+  while(grepl('_',x) && !any(names(mops) == x))x <- sub('_.*','',x)
+  if(!any(names(mops) == x)) return(default)
+  mops <- mops[names(mops) == x]
+  mops <- rev(mops)
+  return(mops[[1]])
+}
+#' Set or Reset Metaplot Options
+#'
+#' Sets an option value in the list \code{getOption('metaplot')}.
+#' If invoked without named arguments, option 'metaplot' is set to NULL.
+#' Setting an existing option moves it to the end of the list (breaks ties in \code{\link{metOption}}).
+#'
+#' @param ... any metaplot options can be defined, using \code{name = value}.
+#' @return (invisible) character vector of option names that were set or unset
+#' @export
+#' @seealso \code{\link{metOption}}\code{\link{options}}
+#' @examples
+#' example(metOption)
+
+setOption <- function(...){
+  args <- list(...)
+  nms <- names(args)
+  mops <- getOption('metaplot', list())
+  if(length(nms) == 0){
+    options(metaplot = NULL)
+    nms <- names(mops)
+    if(!length(nms)) nms <- character(0)
+    invisible(nms)
+  }
+  for(i in nms){
+    mops[[i]] <- NULL
+    mops[[i]] <- args[[i]]
+  }
+  options(metaplot = mops)
+  invisible(nms)
 }
 
 metaplot_aspect <- function(aspect, gg){

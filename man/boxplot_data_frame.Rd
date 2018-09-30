@@ -5,30 +5,28 @@
 \title{Boxplot Function for Data Frame}
 \usage{
 boxplot_data_frame(x, yvar, xvar, facets = NULL,
-  log = metOption("metaplot_log_boxplot", FALSE),
-  crit = metOption("metaplot_crit_boxplot", 1.3),
-  horizontal = metOption("metaplot_horizontal_boxplot", NULL),
-  scales = metOption("metaplot_scales_boxplot", NULL),
-  panel = metOption("metaplot_panel_boxplot", boxplot_panel),
-  ref = metOption("metaplot_ref_x_boxplot", metaplot_ref),
-  ref.col = metOption("metaplot_ref_col_boxplot", "grey"),
-  ref.lty = metOption("metaplot_ref_lty_boxplot", "solid"),
-  ref.lwd = metOption("metaplot_ref_lwd_boxplot", 1),
-  ref.alpha = metOption("metaplot_ref_alpha_boxplot", 1),
-  nobs = metOption("metaplot_nobs_boxplot", FALSE),
-  na.rm = metOption("metaplot_narm_boxplot", TRUE), xlab = NULL,
-  ylab = NULL, numlab = metOption("metaplot_numlab_boxplot", axislabel),
-  catlab = metOption("metaplot_catlab_boxplot", axislabel),
-  aspect = metOption("metaplot_aspect_boxplot", 1),
-  as.table = metOption("metaplot_astable_boxplot", TRUE),
-  main = metOption("metaplot_main_boxplot", NULL),
-  sub = metOption("metaplot_sub_boxplot", NULL),
-  settings = metOption("metaplot_settings_boxplot", NULL),
-  padding = metOption("metaplot_padding_boxplot", 1),
-  reverse = metOption("metaplot_reverse_boxplot", TRUE),
-  pch = metOption("metaplot_pch_boxplot", "|"),
-  notch = metOption("metaplot_notch_boxplot", FALSE),
-  gg = metOption("metaplot_gg_boxplot", FALSE), ...)
+  log = metOption("log_boxplot", FALSE), crit = metOption("crit_boxplot",
+  1.3), horizontal = metOption("horizontal_boxplot", NULL),
+  scales = metOption("scales_boxplot", NULL),
+  panel = metOption("panel_boxplot", "boxplot_panel"),
+  ref = metOption("ref_boxplot", "metaplot_ref"),
+  ref.col = metOption("ref.col_boxplot", "grey"),
+  ref.lty = metOption("ref.lty_boxplot", "solid"),
+  ref.lwd = metOption("ref.lwd_boxplot", 1),
+  ref.alpha = metOption("ref.alpha_boxplot", 1),
+  nobs = metOption("nobs_boxplot", FALSE),
+  na.rm = metOption("na.rm_boxplot", TRUE), xlab = NULL, ylab = NULL,
+  numlab = metOption("numlab_boxplot", "axislabel"),
+  catlab = metOption("catlab_boxplot", "axislabel"),
+  aspect = metOption("aspect_boxplot", 1),
+  as.table = metOption("as.table_boxplot", TRUE),
+  main = metOption("main_boxplot", NULL), sub = metOption("sub_boxplot",
+  NULL), settings = metOption("settings_boxplot", NULL),
+  padding = metOption("padding_boxplot", 1),
+  reverse = metOption("reverse_boxplot", TRUE),
+  pch = metOption("pch_boxplot", "|"), notch = metOption("notch_boxplot",
+  FALSE), gg = metOption("gg_boxplot", FALSE),
+  verbose = metOption("verbose_boxplot", FALSE), ...)
 }
 \arguments{
 \item{x}{data.frame}
@@ -51,7 +49,7 @@ boxplot_data_frame(x, yvar, xvar, facets = NULL,
 
 \item{ref}{optional reference line(s) on numeric axis; can be function(x = x, var = con, ...) or NULL to suppress}
 
-\item{ref.col}{color for reference line(s)}
+\item{ref.col}{color for reference line(s); can be length one integer to auto-select that many colors}
 
 \item{ref.lty}{line type for reference line(s)}
 
@@ -90,6 +88,8 @@ boxplot_data_frame(x, yvar, xvar, facets = NULL,
 \item{notch}{whether to draw notched boxes: passed to \code{\link[lattice]{panel.bwplot}}}
 
 \item{gg}{logical: whether to generate \code{ggplot} instead of \code{trellis}}
+
+\item{verbose}{generate messages describing process}
 
 \item{...}{passed arguments}
 }
