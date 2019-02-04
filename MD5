@@ -1,13 +1,13 @@
-2da2b2c78cd6ac42aade005dfe65ab66 *DESCRIPTION
-d00641776b031a0a734d43ab5aeffd03 *NAMESPACE
+9f61aad6f032914d0b60528ab6794f28 *DESCRIPTION
+105e6be8f33134d379ccc23106db3949 *NAMESPACE
 6f7c7da84e700ddf42747455a4c2424d *R/box.R
-f1a0777686fdea2cba5cba6da58112d0 *R/categorical.R
+01156c3eef875af3165c102209d2d925 *R/categorical.R
 f5b1a5169c8e592198531cc42ce325aa *R/corsplom.R
 1aa0806baaaa87fb35abc3459661b731 *R/density.R
 400bd7eb10fc91bdde0d7c24fc7b15d8 *R/metaplot.R
 38594d3b71fdccb97f59fbd51421f00f *R/multiplot.R
 93c632e61811fb2cad6ae58fedf5de32 *R/pack.R
-fc261ec911bfb4d1a21123d638e20fc6 *R/scatter.R
+f588361c9d7c983835f5a1b6822ba77a *R/scatter.R
 d68a95b5de90e80626f91ddf524ab97a *R/utils.R
 fc2b67441a57a333d3f9843dbbebeeaf *inst/extdata/theoph.csv
 b298405d2fc6114b5ff809703ea5c9c5 *man/as_factor.Rd
@@ -56,7 +56,7 @@ d21e1749519d86e2bc8bbba81b15ea49 *man/plot.metaplot_gtable.Rd
 bb12c9d5d8ef65115459a3e7dc85aa9e *man/region.Rd
 9ee0a17b561e847ad8806723eeb4701a *man/scatter.Rd
 53464ae0fa6482a706cf4cdffcb20c95 *man/scatter.data.frame.Rd
-bf1913b5e6f652e95f9cb0e080a56fb1 *man/scatter_data_frame.Rd
+31f1eacec79e0a4181733803293830b9 *man/scatter_data_frame.Rd
 3f905ee8ec403cba0f4ea9b57422abf2 *man/scatter_panel.Rd
 3ccb6c9b248f82ed2f5f71ec847a7941 *man/scatter_panel_ref.Rd
 59fb3fcaf3f87f90f8b2692a7cf581bd *man/setOption.Rd
