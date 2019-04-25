@@ -1,5 +1,5 @@
-9f61aad6f032914d0b60528ab6794f28 *DESCRIPTION
-105e6be8f33134d379ccc23106db3949 *NAMESPACE
+3968671ec94b6860aa6b12b47642e751 *DESCRIPTION
+51bbdfaa64a814b923513ec36160e59e *NAMESPACE
 6f7c7da84e700ddf42747455a4c2424d *R/box.R
 01156c3eef875af3165c102209d2d925 *R/categorical.R
 f5b1a5169c8e592198531cc42ce325aa *R/corsplom.R
@@ -8,9 +8,8 @@ f5b1a5169c8e592198531cc42ce325aa *R/corsplom.R
 38594d3b71fdccb97f59fbd51421f00f *R/multiplot.R
 93c632e61811fb2cad6ae58fedf5de32 *R/pack.R
 f588361c9d7c983835f5a1b6822ba77a *R/scatter.R
-d68a95b5de90e80626f91ddf524ab97a *R/utils.R
+b9924be7391daacf267f8700afaae9c9 *R/utils.R
 fc2b67441a57a333d3f9843dbbebeeaf *inst/extdata/theoph.csv
-b298405d2fc6114b5ff809703ea5c9c5 *man/as_factor.Rd
 65131da0c142891dbf09e310f0ed9e4e *man/axislabel.Rd
 13d688ff479a2b2b42fa980ace4a3454 *man/axislabel.data.frame.Rd
 d91f761337d8e645bdce8ba154a1edb5 *man/boxplot.Rd

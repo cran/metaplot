@@ -1,7 +1,7 @@
 Package: metaplot
 Type: Package
 Title: Data-Driven Plot Design
-Version: 0.8.2
+Version: 0.8.3
 Author: Tim Bergsma
 Maintainer: Tim Bergsma <bergsmat@gmail.com>
 Description: Designs plots in terms of core structure.  See 'example(metaplot)'.
@@ -18,7 +18,7 @@ Description: Designs plots in terms of core structure.  See 'example(metaplot)'.
  lines, unity lines, smooths, log transformation, and linear fits. The user may choose
  between trellis and ggplot output. Compact syntax and integrated metadata promote workflow 
  scalability.
-Imports: encode (>= 0.3.4), lattice, magrittr, dplyr (>= 0.7.1), tidyr,
+Imports: encode (>= 0.3.6), lattice, magrittr, dplyr (>= 0.7.1), tidyr,
         rlang, grid, gridExtra, gtable, ggplot2, scales
 Suggests: csv, nlme
 Depends: R (>= 2.10)
@@ -27,6 +27,6 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2019-02-04 15:44:23 UTC; tbergsma
+Packaged: 2019-04-24 16:48:57 UTC; tbergsma
 Repository: CRAN
-Date/Publication: 2019-02-04 17:10:10 UTC
+Date/Publication: 2019-04-25 22:52:09 UTC
